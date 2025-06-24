@@ -1,0 +1,78 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+
+# Data directories and datasets
+data/
+output/
+embeddings/
+*.pkl
+*.pickle
+
+# Generated images and media
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+
+# Machine Learning / AI specific
+*.pth
+*.pt
+*.bin
+logs/
+
+# COCO dataset specific
+data/coco/
+data/images/
+data/annotations/
+data/train2017/
+data/val2017/
+*.zip
+
+# Model downloads and cache
+.cache/
+.transformers_cache/
+.huggingface/
+torch/hub/
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+._*
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Temporary files
+*.log
+tmp/
+temp/
+
+# FAISS indices and embeddings
+*.index
+*.metadata
+*.faiss
+
+# API keys and secrets
+*.key
+
