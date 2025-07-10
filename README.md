@@ -1,4 +1,4 @@
-# contextgen
+# contextgen-ai
 
 This project implements a Retrieval-Augmented Generation (RAG) system for AI image generation. The system uses a dataset of images and their associated metadata to guide the image generation process, ensuring that generated images maintain stylistic and conceptual consistency with the training data.
 
