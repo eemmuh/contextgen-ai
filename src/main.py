@@ -45,7 +45,12 @@ def process_dataset(
         embedding_manager = EmbeddingManager()
     
     # Process each item in the dataset
+    print(f"📊 Processing {len(dataset)} images...")
+    
     for i in range(len(dataset)):
+        if i % 20 == 0:  # Progress indicator
+            print(f"   Processing image {i+1}/{len(dataset)}")
+        
         item = dataset[i]
         
         # Compute embeddings
@@ -53,9 +58,9 @@ def process_dataset(
         metadata_text = dataset.get_metadata_text(i)
         text_embedding = embedding_manager.compute_text_embedding(metadata_text)
         
-        # Add to index
+        # Add text embedding to index for text-based search
         embedding_manager.add_to_index(
-            embedding=image_embedding,
+            embedding=text_embedding,  # Use text embedding for text search
             metadata=item['metadata'],
             image_path=item['image_path']
         )
@@ -96,11 +101,25 @@ def main():
             max_images=args.max_images
         )
     else:
-        # Load existing embeddings
-        try:
-            embedding_manager.load_index(f"embeddings/{args.dataset_type}_dataset")
-        except FileNotFoundError:
-            print(f"No existing embeddings found. Please run with --process-dataset first.")
+        # Load existing embeddings - try different possible names
+        embedding_loaded = False
+        possible_paths = [
+            f"embeddings/{args.dataset_type}_dataset",
+            "embeddings/dataset",  # Fallback to generic dataset
+            f"embeddings/{args.dataset_type}"
+        ]
+        
+        for path in possible_paths:
+            try:
+                embedding_manager.load_index(path)
+                print(f"✅ Loaded embeddings from: {path}")
+                embedding_loaded = True
+                break
+            except (FileNotFoundError, RuntimeError):
+                continue
+        
+        if not embedding_loaded:
+            print(f"❌ No existing embeddings found. Please run with --process-dataset first.")
             return
     
     # Initialize RAG and image generation components

@@ -12,7 +12,7 @@ class COCODataset(ImageMetadataDataset):
         coco_dir: str,
         processor: Optional[CLIPProcessor] = None,
         max_images: Optional[int] = None,
-        split: str = "train2017"
+        split: str = "val2017"  # Changed default to val2017 since that's what we downloaded
     ):
         """
         Initialize the COCO dataset adapter.
