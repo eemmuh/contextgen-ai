@@ -5,6 +5,7 @@ from typing import Dict, List, Tuple, Optional
 import torch
 from torch.utils.data import Dataset
 from transformers import CLIPProcessor
+from src.utils.model_cache import get_model_cache
 
 class ImageMetadataDataset(Dataset):
     def __init__(
@@ -24,7 +25,7 @@ class ImageMetadataDataset(Dataset):
             max_images: Maximum number of images to load (for testing)
         """
         self.image_dir = image_dir
-        self.processor = processor or CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+        self.processor = processor or self._load_clip_processor("openai/clip-vit-base-patch32")
         
         # Load metadata
         self.metadata = pd.read_csv(metadata_path)
@@ -39,6 +40,12 @@ class ImageMetadataDataset(Dataset):
                 self.valid_images.append(idx)
         
         self.metadata = self.metadata.iloc[self.valid_images].reset_index(drop=True)
+    
+    def _load_clip_processor(self, model_name: str) -> CLIPProcessor:
+        """Load CLIP processor with caching."""
+        # For processors, we'll use a simpler approach since they're lightweight
+        # and don't need the full caching system
+        return CLIPProcessor.from_pretrained(model_name)
     
     def __len__(self) -> int:
         return len(self.metadata)

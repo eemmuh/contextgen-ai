@@ -9,6 +9,7 @@ This project implements a Retrieval-Augmented Generation (RAG) system for AI ima
 - Integration with state-of-the-art image generation models
 - RAG-based prompt enhancement
 - Efficient storage and retrieval of image embeddings
+- **Model caching system** for faster startup and reduced bandwidth usage
 
 ## Setup
 
@@ -71,6 +72,11 @@ python -m src.main --prompt "a cat sitting on a chair" --num-images 2
 python examples/basic_usage.py
 ```
 
+### 5. Model Caching Demo
+```bash
+python examples/model_caching_demo.py
+```
+
 ## Advanced Usage
 
 ### Configuration
@@ -79,6 +85,32 @@ Edit `config/config.py` to customize:
 - Embedding parameters
 - Dataset options
 - Device preferences
+
+### Model Caching
+The system includes an intelligent model caching system that:
+- Caches models in memory for instant access
+- Stores models on disk to avoid re-downloading
+- Provides cache management commands
+
+**Cache Management Commands:**
+```bash
+# View cache information
+python -m src.main --cache-info
+
+# Clear specific model type cache
+python -m src.main --clear-cache clip
+python -m src.main --clear-cache sentence_transformer
+python -m src.main --clear-cache stable_diffusion
+
+# Clear all cache
+python -m src.main --clear-cache all
+```
+
+**Benefits:**
+- **Faster startup**: Models load from cache instead of downloading
+- **Reduced bandwidth**: Models are cached locally
+- **Offline capability**: Cached models work without internet
+- **Memory efficiency**: In-memory caching for frequently used models
 
 ### Custom Datasets
 To use your own dataset instead of COCO:

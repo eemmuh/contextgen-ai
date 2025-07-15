@@ -6,6 +6,7 @@ from sentence_transformers import SentenceTransformer
 from transformers import CLIPProcessor, CLIPModel
 import os
 import pickle
+from src.utils.model_cache import get_model_cache
 
 class EmbeddingManager:
     def __init__(
@@ -27,14 +28,77 @@ class EmbeddingManager:
         self.device = device
         self.embedding_dim = embedding_dim
         
-        # Initialize models
-        self.text_model = SentenceTransformer(text_model_name, device=device)
-        self.image_model = CLIPModel.from_pretrained(image_model_name).to(device)
-        self.image_processor = CLIPProcessor.from_pretrained(image_model_name)
+        # Get model cache
+        self.model_cache = get_model_cache()
+        
+        # Initialize models with caching
+        print(f"🔄 Loading text model: {text_model_name}")
+        self.text_model = self._load_text_model(text_model_name)
+        
+        print(f"🔄 Loading image model: {image_model_name}")
+        self.image_model, self.image_processor = self._load_image_model(image_model_name)
         
         # Initialize FAISS index
         self.index = faiss.IndexFlatL2(embedding_dim)
         self.metadata_store = []
+    
+    def _load_text_model(self, model_name: str) -> SentenceTransformer:
+        """Load text model with caching."""
+        # Try to get from cache first
+        cached_model = self.model_cache.get_cached_model(
+            model_type="sentence_transformer",
+            model_name=model_name,
+            device=self.device
+        )
+        
+        if cached_model is not None:
+            return cached_model
+        
+        # Load from HuggingFace and cache
+        print(f"📥 Downloading text model: {model_name}")
+        model = SentenceTransformer(model_name, device=self.device)
+        
+        # Cache the model
+        self.model_cache.cache_model(
+            model=model,
+            model_type="sentence_transformer",
+            model_name=model_name,
+            device=self.device
+        )
+        
+        return model
+    
+    def _load_image_model(self, model_name: str) -> tuple[CLIPModel, CLIPProcessor]:
+        """Load image model with caching."""
+        # Try to get from cache first
+        cached_model = self.model_cache.get_cached_model(
+            model_type="clip",
+            model_name=model_name,
+            device=self.device
+        )
+        
+        if cached_model is not None:
+            # For CLIP, we need to handle processor separately
+            processor = CLIPProcessor.from_pretrained(model_name)
+            return cached_model, processor
+        
+        # Load from HuggingFace and cache
+        print(f"📥 Downloading image model: {model_name}")
+        model = CLIPModel.from_pretrained(model_name).to(self.device)
+        processor = CLIPProcessor.from_pretrained(model_name)
+        
+        # Attach processor to model for caching
+        model.processor = processor
+        
+        # Cache the model
+        self.model_cache.cache_model(
+            model=model,
+            model_type="clip",
+            model_name=model_name,
+            device=self.device
+        )
+        
+        return model, processor
         
     def compute_text_embedding(self, text: str) -> np.ndarray:
         """Compute embedding for a text input."""

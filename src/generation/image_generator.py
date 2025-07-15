@@ -3,6 +3,7 @@ from diffusers import StableDiffusionPipeline
 from typing import Dict, Optional, List
 import os
 from PIL import Image
+from src.utils.model_cache import get_model_cache
 
 class ImageGenerator:
     def __init__(
@@ -25,12 +26,12 @@ class ImageGenerator:
         self.num_inference_steps = num_inference_steps
         self.guidance_scale = guidance_scale
         
-        # Initialize the pipeline
-        self.pipeline = StableDiffusionPipeline.from_pretrained(
-            model_id,
-            torch_dtype=torch.float16 if device == "cuda" else torch.float32
-        )
-        self.pipeline = self.pipeline.to(device)
+        # Get model cache
+        self.model_cache = get_model_cache()
+        
+        # Initialize the pipeline with caching
+        print(f"🔄 Loading Stable Diffusion model: {model_id}")
+        self.pipeline = self._load_stable_diffusion_model(model_id)
         
         if device == "cuda":
             self.pipeline.enable_attention_slicing()
@@ -38,6 +39,40 @@ class ImageGenerator:
             self.pipeline.enable_model_cpu_offload()  # Offload to CPU when not in use
             self.pipeline.enable_vae_slicing()  # Reduce memory usage
             self.pipeline.enable_sequential_cpu_offload()  # Sequential offloading
+    
+    def _load_stable_diffusion_model(self, model_id: str) -> StableDiffusionPipeline:
+        """Load Stable Diffusion model with caching."""
+        torch_dtype = torch.float16 if self.device == "cuda" else torch.float32
+        
+        # Try to get from cache first
+        cached_model = self.model_cache.get_cached_model(
+            model_type="stable_diffusion",
+            model_name=model_id,
+            device=self.device,
+            torch_dtype=torch_dtype
+        )
+        
+        if cached_model is not None:
+            return cached_model
+        
+        # Load from HuggingFace and cache
+        print(f"📥 Downloading Stable Diffusion model: {model_id}")
+        pipeline = StableDiffusionPipeline.from_pretrained(
+            model_id,
+            torch_dtype=torch_dtype
+        )
+        pipeline = pipeline.to(self.device)
+        
+        # Cache the model
+        self.model_cache.cache_model(
+            model=pipeline,
+            model_type="stable_diffusion",
+            model_name=model_id,
+            device=self.device,
+            torch_dtype=torch_dtype
+        )
+        
+        return pipeline
     
     def generate_image(
         self,

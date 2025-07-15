@@ -48,6 +48,7 @@ data/val2017/
 .transformers_cache/
 .huggingface/
 torch/hub/
+.model_cache/
 
 # IDE and editors
 .idea/

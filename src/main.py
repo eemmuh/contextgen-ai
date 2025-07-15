@@ -6,6 +6,7 @@ from src.data_processing.coco_dataset import COCODataset
 from src.embedding.embedding_manager import EmbeddingManager
 from src.retrieval.rag_manager import RAGManager
 from src.generation.image_generator import ImageGenerator
+from src.utils.model_cache import get_model_cache
 from typing import Optional
 
 def setup_environment():
@@ -83,11 +84,35 @@ def main():
     parser.add_argument("--process-dataset", action="store_true",
                       help="Process the dataset and create embeddings")
     parser.add_argument("--max-images", type=int, help="Maximum number of images to process")
+    parser.add_argument("--cache-info", action="store_true", help="Show model cache information")
+    parser.add_argument("--clear-cache", type=str, choices=["all", "clip", "sentence_transformer", "stable_diffusion"],
+                      help="Clear model cache (all or specific model type)")
     
     args = parser.parse_args()
     
     # Setup environment
     setup_environment()
+    
+    # Handle cache management commands
+    if args.cache_info:
+        model_cache = get_model_cache()
+        cache_info = model_cache.get_cache_info()
+        print("📊 Model Cache Information:")
+        print(f"   Memory cache size: {cache_info['memory_cache_size']} models")
+        print(f"   Disk cache size: {cache_info['disk_cache_size']} models")
+        print(f"   Total cache size: {cache_info['total_size_bytes'] / (1024*1024):.2f} MB")
+        print("   Cached models:")
+        for model_type, model_name in cache_info['cached_models'].items():
+            print(f"     - {model_type}: {model_name}")
+        return
+    
+    if args.clear_cache:
+        model_cache = get_model_cache()
+        if args.clear_cache == "all":
+            model_cache.clear_cache()
+        else:
+            model_cache.clear_cache(args.clear_cache)
+        return
     
     # Initialize components
     embedding_manager = EmbeddingManager()

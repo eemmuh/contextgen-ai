@@ -25,7 +25,7 @@ class COCODataset(ImageMetadataDataset):
         """
         self.coco_dir = coco_dir
         self.split = split
-        self.processor = processor or CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+        self.processor = processor or self._load_clip_processor("openai/clip-vit-base-patch32")
         
         # Load processed annotations
         with open(os.path.join(coco_dir, "processed_annotations.json"), 'r') as f:
@@ -47,6 +47,12 @@ class COCODataset(ImageMetadataDataset):
                 self.valid_images.append(idx)
         
         self.annotations = [self.annotations[i] for i in self.valid_images]
+    
+    def _load_clip_processor(self, model_name: str) -> CLIPProcessor:
+        """Load CLIP processor with caching."""
+        # For processors, we'll use a simpler approach since they're lightweight
+        # and don't need the full caching system
+        return CLIPProcessor.from_pretrained(model_name)
     
     def __len__(self) -> int:
         return len(self.annotations)
