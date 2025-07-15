@@ -9,7 +9,7 @@ class ImageGenerator:
         self,
         model_id: str = "runwayml/stable-diffusion-v1-5",
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
-        num_inference_steps: int = 50,
+        num_inference_steps: int = 20,  # Reduced from 50 to 20 for speed
         guidance_scale: float = 7.5
     ):
         """
@@ -34,13 +34,18 @@ class ImageGenerator:
         
         if device == "cuda":
             self.pipeline.enable_attention_slicing()
+            # Additional optimizations for speed
+            self.pipeline.enable_model_cpu_offload()  # Offload to CPU when not in use
+            self.pipeline.enable_vae_slicing()  # Reduce memory usage
+            self.pipeline.enable_sequential_cpu_offload()  # Sequential offloading
     
     def generate_image(
         self,
         prompt: str,
         negative_prompt: Optional[str] = None,
         num_images: int = 1,
-        seed: Optional[int] = None
+        seed: Optional[int] = None,
+        fast_mode: bool = False
     ) -> List[Image.Image]:
         """
         Generate images based on the prompt.
@@ -59,13 +64,17 @@ class ImageGenerator:
         else:
             generator = None
         
+        # Adjust parameters for fast mode
+        inference_steps = 10 if fast_mode else self.num_inference_steps
+        guidance_scale = 5.0 if fast_mode else self.guidance_scale
+        
         # Generate images
         images = self.pipeline(
             prompt=prompt,
             negative_prompt=negative_prompt,
             num_images_per_prompt=num_images,
-            num_inference_steps=self.num_inference_steps,
-            guidance_scale=self.guidance_scale,
+            num_inference_steps=inference_steps,
+            guidance_scale=guidance_scale,
             generator=generator
         ).images
         
@@ -104,7 +113,8 @@ class ImageGenerator:
         rag_output: Dict,
         output_dir: str,
         num_images: int = 1,
-        seed: Optional[int] = None
+        seed: Optional[int] = None,
+        fast_mode: bool = False
     ) -> Dict:
         """
         Generate images using the output from the RAG process.
@@ -126,7 +136,8 @@ class ImageGenerator:
         images = self.generate_image(
             prompt=rag_output['augmented_prompt'],
             num_images=num_images,
-            seed=seed
+            seed=seed,
+            fast_mode=fast_mode
         )
         
         # Save generated images

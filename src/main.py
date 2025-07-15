@@ -79,6 +79,7 @@ def main():
     parser.add_argument("--metadata", type=str, help="Path to metadata CSV (for custom dataset)")
     parser.add_argument("--num-images", type=int, default=1, help="Number of images to generate")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
+    parser.add_argument("--fast-mode", action="store_true", help="Use fast generation mode (10 steps)")
     parser.add_argument("--process-dataset", action="store_true",
                       help="Process the dataset and create embeddings")
     parser.add_argument("--max-images", type=int, help="Maximum number of images to process")
@@ -144,7 +145,8 @@ def main():
             rag_output=rag_output,
             output_dir="output",
             num_images=args.num_images,
-            seed=args.seed
+            seed=args.seed,
+            fast_mode=args.fast_mode
         )
         
         print("\nGenerated images saved to:")
