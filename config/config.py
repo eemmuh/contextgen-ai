@@ -26,6 +26,32 @@ MODEL_CONFIG = {
     }
 }
 
+# Cache configuration
+CACHE_CONFIG = {
+    "cache_dir": ".model_cache",
+    "max_memory_size_mb": 2048,  # 2GB memory limit
+    "max_disk_size_mb": 10240,   # 10GB disk limit
+    "compression_enabled": True,
+    "enable_validation": True,
+    "warmup_models": [
+        {
+            "model_type": "sentence_transformer",
+            "model_name": "all-MiniLM-L6-v2",
+            "device": "cuda" if os.getenv("FORCE_CPU") != "1" else "cpu"
+        },
+        {
+            "model_type": "clip",
+            "model_name": "openai/clip-vit-base-patch32",
+            "device": "cuda" if os.getenv("FORCE_CPU") != "1" else "cpu"
+        }
+    ],
+    "optimization": {
+        "auto_optimize": True,
+        "optimization_interval_hours": 24,
+        "max_age_days": 30
+    }
+}
+
 # Embedding settings
 EMBEDDING_CONFIG = {
     "embedding_dim": 384,
