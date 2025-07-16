@@ -1,4 +1,4 @@
-.PHONY: help install setup clean test download-data process-data generate example
+.PHONY: help install setup clean test download-data process-data generate example monitor health optimize
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -17,6 +17,8 @@ clean: ## Clean generated files and cache
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.log" -delete
+	rm -rf logs/
+	rm -rf reports/
 
 test: ## Run tests
 	python -m pytest tests/ -v
@@ -33,6 +35,30 @@ generate: ## Generate example images
 example: ## Run basic usage example
 	python examples/basic_usage.py
 
+monitor: ## Run system monitoring
+	python scripts/system_monitor.py overview
+
+health: ## Run health checks
+	python scripts/system_monitor.py health
+
+performance: ## Show performance metrics
+	python scripts/system_monitor.py performance
+
+cache-info: ## Show cache information
+	python scripts/system_monitor.py cache
+
+monitor-realtime: ## Start real-time monitoring
+	python scripts/system_monitor.py monitor --duration 300 --interval 5
+
+export-reports: ## Export all system reports
+	python scripts/system_monitor.py export --output-dir reports
+
+optimize: ## Optimize system performance
+	python scripts/system_monitor.py optimize
+
+cache-manage: ## Manage model cache
+	python scripts/cache_manager.py info
+
 format: ## Format code with black
 	black src/ tests/ examples/ scripts/
 
@@ -44,4 +70,5 @@ dev-setup: setup ## Complete development setup
 	@echo "Next steps:"
 	@echo "1. Run 'make download-data' to get COCO dataset"
 	@echo "2. Run 'make process-data' to create embeddings"
-	@echo "3. Run 'make example' to test the system" 
+	@echo "3. Run 'make example' to test the system"
+	@echo "4. Run 'make monitor' to check system status" 
