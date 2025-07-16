@@ -87,23 +87,31 @@ class TestModelCache(unittest.TestCase):
     
     def test_memory_cache_eviction(self):
         """Test memory cache eviction when size limit is exceeded."""
-        # Create a large mock model
+        # Create a large mock model that exceeds the 10MB limit
         large_model = type('LargeModel', (), {
             'state_dict': lambda: {'param1': torch.randn(1000, 1000)},
             'parameters': lambda: [torch.randn(1000, 1000)]
         })()
         
-        # Add model to cache (should trigger eviction due to small limit)
-        self.cache.cache_model(
-            model=large_model,
-            model_type="test",
-            model_name="large-model",
-            device="cpu"
-        )
+        # Mock the size estimation to return a large size that will trigger eviction
+        original_estimate = self.cache._estimate_model_size
+        self.cache._estimate_model_size = lambda model: 20 * 1024 * 1024  # 20MB
         
-        # Check that cache size is within limits
-        info = self.cache.get_cache_info()
-        self.assertLessEqual(info['memory_cache_size_mb'], 10)
+        try:
+            # Add model to cache (should trigger eviction due to small limit)
+            self.cache.cache_model(
+                model=large_model,
+                model_type="test",
+                model_name="large-model",
+                device="cpu"
+            )
+            
+            # Check that cache size is within limits (eviction should have occurred)
+            info = self.cache.get_cache_info()
+            self.assertLessEqual(info['memory_cache_size_mb'], 10)
+        finally:
+            # Restore original method
+            self.cache._estimate_model_size = original_estimate
     
     def test_cache_statistics(self):
         """Test cache statistics tracking."""
