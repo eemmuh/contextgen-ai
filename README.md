@@ -1,4 +1,4 @@
-# Image Model COCO Model
+# contextgen-ai
 
 A RAG-based image generation system that uses COCO dataset for retrieval-augmented generation.
 
@@ -13,7 +13,7 @@ A RAG-based image generation system that uses COCO dataset for retrieval-augment
 - **Error Handling**: Robust error handling with retry logic and circuit breakers
 - **Structured Logging**: Advanced logging with JSON output and colored console
 
-## 🚀 Major Improvements
+## Major Improvements
 
 ### 1. **Advanced Model Caching**
 - **Size Limits**: Configurable memory (2GB) and disk (10GB) limits with automatic eviction
@@ -64,7 +64,7 @@ A RAG-based image generation system that uses COCO dataset for retrieval-augment
 - **System Optimization**: Automated system optimization
 - **Report Generation**: Comprehensive system reports
 
-## 📊 Cache Statistics
+## Cache Statistics
 
 The cache provides detailed statistics including:
 - Hit rate percentage
@@ -74,7 +74,7 @@ The cache provides detailed statistics including:
 - Validation failures
 - Request rates
 
-## 🛠️ System Management
+## System Management
 
 ### Cache Management
 ```bash
@@ -143,7 +143,7 @@ make optimize        # System optimization
 make cache-manage    # Cache management
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Cache Configuration
 ```python
@@ -217,7 +217,7 @@ def generate_image(prompt):
     pass
 ```
 
-## 📈 Performance Benefits
+## Performance Benefits
 
 - **Faster Startup**: Models load from cache instead of downloading
 - **Reduced Bandwidth**: No repeated downloads of the same models
@@ -228,7 +228,7 @@ def generate_image(prompt):
 - **Performance Insights**: Detailed performance monitoring and optimization
 - **System Health**: Proactive health monitoring and alerts
 
-## 🔧 Advanced Usage
+## Advanced Usage
 
 ### Cache Warmup
 ```python
@@ -412,5 +412,46 @@ python tests/test_model_cache.py
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Cleanup
+
+To remove temporary files, logs, caches, and outputs:
+```bash
+make clean           # Remove .pyc, __pycache__, logs, cache, and reports
+rm -rf .model_cache  # Remove all cached models (can be large)
+rm -rf output/*      # Remove generated images
+rm -rf embeddings/*  # Remove generated embeddings
+```
+
+## Prompt Examples
+
+Here are some example prompts you can use for image generation:
+- "A cat sitting on a red couch in a modern living room"
+- "A group of people riding bicycles in a city park"
+- "A bowl of fresh fruit on a wooden table"
+- "A futuristic city skyline at sunset"
+- "A dog playing with a ball on the beach"
+
+## Linting & Code Quality
+
+To check code style and linting errors, use flake8:
+```bash
+pip install flake8
+python -m flake8 src/ --max-line-length=120
+```
+
+> **Note:** You may see a persistent F541 warning about f-strings in `src/main.py`. This is a false positive and can be safely ignored if the code is correct.
+
+## Cache Directory Size
+
+The `.model_cache` directory can grow large (several GBs) depending on the models used. To manage disk space:
+- Use `python scripts/cache_manager.py optimize` to clean up old cache entries
+- Use `python scripts/cache_manager.py clear` to remove all cached models
+- Manually delete `.model_cache` if needed
+
+## Known Issues
+
+- **flake8 F541 Warning:** A persistent F541 warning may appear for f-strings in `src/main.py` even if the code is correct. This is a known flake8 issue and can be ignored.
+- **Large Cache Size:** The `.model_cache` directory can consume significant disk space. Use the provided cache management tools to clean up as needed.
 
 

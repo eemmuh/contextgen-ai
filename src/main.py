@@ -126,7 +126,7 @@ def main():
         print("   Cached models:")
         for model_type, model_names in cache_info["cached_models"].items():
             model_names_str = ', '.join(model_names)
-            print(f"     - {model_type}: {model_names_str}")
+            print("     - {}: {}".format(model_type, model_names_str))
         return
 
     if args.clear_cache:
