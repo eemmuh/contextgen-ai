@@ -1,1 +1,1 @@
-"""Test package for the RAG-based Image Generation System.""" 
+"""Test package for the RAG-based Image Generation System."""
