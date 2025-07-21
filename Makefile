@@ -72,3 +72,90 @@ dev-setup: setup ## Complete development setup
 	@echo "2. Run 'make process-data' to create embeddings"
 	@echo "3. Run 'make example' to test the system"
 	@echo "4. Run 'make monitor' to check system status" 
+
+# Database commands
+setup-db: ## Setup PostgreSQL database and tables
+	python scripts/setup_database.py
+
+verify-db: ## Verify database setup
+	python scripts/setup_database.py --verify-only
+
+migrate-faiss: ## Migrate from FAISS to database (dry run)
+	python scripts/migrate_to_database.py --dry-run
+
+migrate-faiss-real: ## Migrate from FAISS to database (actual migration)
+	python scripts/migrate_to_database.py
+
+list-datasets: ## List available FAISS datasets for migration 
+
+# Docker commands
+docker-up: ## Start PostgreSQL database with Docker
+	docker-compose up -d postgres
+
+docker-down: ## Stop PostgreSQL database
+	docker-compose down
+
+docker-logs: ## View PostgreSQL logs
+	docker-compose logs postgres
+
+docker-reset: ## Reset PostgreSQL database (removes all data)
+	docker-compose down -v
+	docker-compose up -d postgres
+
+# Development and code quality commands
+dev-install: ## Install development dependencies
+	pip install -r requirements-dev.txt
+
+type-check: ## Run type checking with mypy
+	mypy src/ --ignore-missing-imports
+
+security-check: ## Run security checks with bandit
+	bandit -r src/ -f json -o reports/security-report.json
+
+complexity-check: ## Check code complexity with radon
+	radon cc src/ -a
+	radon mi src/ -a
+
+test-coverage: ## Run tests with coverage report
+	pytest --cov=src --cov-report=html --cov-report=term
+
+test-integration: ## Run integration tests
+	pytest tests/integration/ -v
+
+test-unit: ## Run unit tests only
+	pytest tests/unit/ -v
+
+pre-commit-install: ## Install pre-commit hooks
+	pre-commit install
+
+pre-commit-run: ## Run pre-commit hooks on all files
+	pre-commit run --all-files
+
+clean-all: clean ## Clean everything including cache and models
+	rm -rf .model_cache/
+	rm -rf .pytest_cache/
+	rm -rf htmlcov/
+	rm -rf dist/
+	rm -rf build/
+	rm -rf *.egg-info/
+
+docs-build: ## Build documentation
+	cd docs && make html
+
+docs-serve: ## Serve documentation locally
+	cd docs && python -m http.server 8000
+
+# Complete development setup
+dev-setup-complete: dev-install pre-commit-install ## Complete development environment setup
+	@echo "🎉 Complete development environment ready!"
+	@echo "Installed:"
+	@echo "  ✅ Development dependencies"
+	@echo "  ✅ Pre-commit hooks"
+	@echo "  ✅ Code quality tools"
+	@echo ""
+	@echo "Next steps:"
+	@echo "1. Run 'make docker-up' to start database"
+	@echo "2. Run 'make setup-db' to setup database"
+	@echo "3. Run 'make test' to run tests"
+	@echo "4. Run 'make lint' to check code style"
+	@echo "5. Run 'make format' to format code" 
