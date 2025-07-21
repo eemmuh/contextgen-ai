@@ -72,6 +72,22 @@ DEVICE = "cuda" if os.getenv("FORCE_CPU") != "1" else "cpu"
 # Environment variables
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 
+# Database settings
+DATABASE_CONFIG = {
+    "url": os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5433/image_rag_db"),
+    "pool_size": 10,
+    "max_overflow": 20,
+    "pool_recycle": 3600,
+    "echo": os.getenv("DB_ECHO", "false").lower() == "true"
+}
+
+# Vector search settings
+VECTOR_SEARCH_CONFIG = {
+    "similarity_threshold": 0.5,
+    "max_results": 10,
+    "embedding_dimension": 384
+}
+
 # Create directories if they don't exist
 for directory in [DATA_DIR, OUTPUT_DIR, EMBEDDINGS_DIR, COCO_DATA_DIR]:
     directory.mkdir(parents=True, exist_ok=True) 
