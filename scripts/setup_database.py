@@ -44,6 +44,58 @@ def create_database_schema():
         logger.info("Creating database tables...")
         create_tables()
         logger.info("Database schema created successfully")
+        
+        # Create performance indexes
+        logger.info("Creating performance indexes...")
+        with engine.connect() as conn:
+            # Vector similarity search index
+            conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_embeddings_vector 
+                ON embeddings USING ivfflat (embedding vector_cosine_ops)
+                WITH (lists = 100)
+            """))
+            
+            # Metadata indexes
+            conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_embeddings_model_type 
+                ON embeddings(model_type)
+            """))
+            
+            conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_embeddings_embedding_type 
+                ON embeddings(embedding_type)
+            """))
+            
+            conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_images_source_dataset 
+                ON images(source_dataset)
+            """))
+            
+            conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_images_tags 
+                ON images USING GIN(tags)
+            """))
+            
+            conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_generations_status 
+                ON generations(status)
+            """))
+            
+            conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_generations_created_at 
+                ON generations(created_at DESC)
+            """))
+            
+            conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS idx_system_metrics_timestamp 
+                ON system_metrics(timestamp DESC)
+            """))
+            
+            # Commit the changes
+            conn.commit()
+            
+        logger.info("Performance indexes created successfully")
+        
     except Exception as e:
         logger.error(f"Failed to create database schema: {e}")
         raise
