@@ -80,6 +80,24 @@ setup-db: ## Setup PostgreSQL database and tables
 verify-db: ## Verify database setup
 	python scripts/setup_database.py --verify-only
 
+health-check: ## Run database health check
+	python scripts/database_health_check.py
+
+backup-db: ## Create database backup
+	python scripts/database_backup.py backup
+
+list-backups: ## List available backups
+	python scripts/database_backup.py list
+
+cleanup-backups: ## Clean up old backups (keep 30 days)
+	python scripts/database_backup.py cleanup --keep-days 30
+
+analytics: ## Generate database analytics report
+	python scripts/database_analytics.py
+
+analytics-json: ## Generate database analytics report in JSON format
+	python scripts/database_analytics.py --format json
+
 migrate-faiss: ## Migrate from FAISS to database (dry run)
 	python scripts/migrate_to_database.py --dry-run
 
