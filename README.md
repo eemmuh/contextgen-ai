@@ -1,4 +1,4 @@
-# 🎨 Image Model COCO
+# contextgen-ai
 
 **RAG-based Image Generation System with PostgreSQL Vector Database**
 
@@ -9,17 +9,17 @@ A comprehensive Retrieval-Augmented Generation (RAG) system for image generation
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
 [![pgvector](https://img.shields.io/badge/pgvector-✓-green.svg)](https://github.com/pgvector/pgvector)
 
-## ✨ Features
+## Features
 
-- 🔍 **Vector Similarity Search**: Fast image retrieval using pgvector
-- 🧠 **RAG Pipeline**: Context-aware image generation
-- 🗄️ **PostgreSQL Database**: Scalable data storage with vector support
-- 📊 **Performance Monitoring**: Comprehensive metrics and logging
-- 🎯 **COCO Integration**: Full dataset support with metadata
-- ⚡ **Model Caching**: Intelligent caching for improved performance
-- 🐳 **Docker Support**: Easy deployment with Docker Compose
+- **Vector Similarity Search**: Fast image retrieval using pgvector
+- **RAG Pipeline**: Context-aware image generation
+- **PostgreSQL Database**: Scalable data storage with vector support
+- **Performance Monitoring**: Comprehensive metrics and logging
+- **COCO Integration**: Full dataset support with metadata
+- **Model Caching**: Intelligent caching for improved performance
+- **Docker Support**: Easy deployment with Docker Compose
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Clone and setup
@@ -37,14 +37,14 @@ make setup-db
 python examples/database_usage.py
 ```
 
-## 📖 Documentation
+## Documentation
 
-- 📚 **[Full Documentation](docs/README.md)** - Complete project documentation
-- ⚡ **[Quick Start](docs/quickstart.md)** - Get up and running in 5 minutes
-- 🔧 **[Installation Guide](docs/installation.md)** - Detailed setup instructions
-- 🗄️ **[Database Setup](DATABASE_SETUP.md)** - PostgreSQL and pgvector configuration
+- **[Full Documentation](docs/README.md)** - Complete project documentation
+- **[Quick Start](docs/quickstart.md)** - Get up and running in 5 minutes
+- **[Installation Guide](docs/installation.md)** - Detailed setup instructions
+- **[Database Setup](DATABASE_SETUP.md)** - PostgreSQL and pgvector configuration
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -59,7 +59,7 @@ python examples/database_usage.py
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-## 🎯 Key Components
+## Key Components
 
 ### Database Integration
 - **PostgreSQL** with **pgvector** extension
@@ -79,14 +79,14 @@ python examples/database_usage.py
 - **Prompt augmentation** with retrieved examples
 - **Generation tracking** and history
 
-## 📊 Performance
+## Performance
 
 - **Vector Search**: < 100ms for 1M+ embeddings
 - **Image Processing**: Batch processing with configurable sizes
 - **Database**: Connection pooling and optimized queries
 - **Caching**: Intelligent model and result caching
 
-## 🔧 Configuration
+## Configuration
 
 ```python
 # config/config.py
@@ -103,7 +103,7 @@ MODEL_CONFIG = {
 }
 ```
 
-## 📈 Usage Examples
+## Usage Examples
 
 ### Basic Image Search
 ```python
@@ -131,7 +131,7 @@ augmented_prompt = rag_manager.augment_prompt(prompt)
 generated_image = generator.generate(augmented_prompt)
 ```
 
-## 🛠️ Development
+## Development
 
 ### Setup Development Environment
 ```bash
@@ -165,38 +165,5 @@ image-model-coco-model/
 ├── docs/                  # Documentation
 └── docker/                # Docker config
 ```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](docs/contributing.md) for details.
-
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [COCO Dataset](https://cocodataset.org/) for the image dataset
-- [pgvector](https://github.com/pgvector/pgvector) for PostgreSQL vector support
-- [Sentence Transformers](https://www.sbert.net/) for text embeddings
-- [CLIP](https://openai.com/research/clip) for image embeddings
-
-## 📞 Support
-
-- 📖 [Documentation](docs/README.md)
-- 🐛 [Report Issues](https://github.com/yourusername/image-model-coco-model/issues)
-- 💬 [Discord Community](https://discord.gg/your-community)
-- 📧 [Email Support](mailto:support@yourproject.com)
-
----
-
-**Made with ❤️ for the AI/ML community**
 
 
