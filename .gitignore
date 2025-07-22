@@ -1,5 +1,10 @@
-# Environment variables
+# Environment variables and secrets
 .env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets/
 
 # Python
 __pycache__/
@@ -10,10 +15,23 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
 
 # Virtual environments
 venv/
 .venv/
+env/
+ENV/
+env.bak/
+venv.bak/
 
 # Data directories and datasets
 data/
@@ -21,6 +39,10 @@ output/
 embeddings/
 *.pkl
 *.pickle
+*.h5
+*.hdf5
+*.parquet
+*.feather
 
 # Generated images and media
 *.png
@@ -28,12 +50,23 @@ embeddings/
 *.jpeg
 *.gif
 *.bmp
+*.tiff
+*.webp
+*.svg
 
 # Machine Learning / AI specific
 *.pth
 *.pt
 *.bin
+*.safetensors
+*.onnx
+*.tflite
+*.pb
 logs/
+models/
+checkpoints/
+runs/
+wandb/
 
 # COCO dataset specific
 data/coco/
@@ -41,7 +74,10 @@ data/images/
 data/annotations/
 data/train2017/
 data/val2017/
+data/test2017/
 *.zip
+*.tar.gz
+*.tar.bz2
 
 # Model downloads and cache
 .cache/
@@ -49,31 +85,230 @@ data/val2017/
 .huggingface/
 torch/hub/
 .model_cache/
+sentence_transformers_cache/
+clip_cache/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgres_data/
+mysql_data/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
 
 # IDE and editors
 .idea/
 .vscode/
 *.swp
 *.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
 
 # OS specific
 .DS_Store
 ._*
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb
 
 # Temporary files
 *.log
+*.tmp
+*.temp
 tmp/
 temp/
+.tmp/
 
 # FAISS indices and embeddings
 *.index
 *.metadata
 *.faiss
+faiss_index/
+faiss_metadata/
+
+# Development and testing
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Documentation builds
+docs/_build/
+docs/build/
+site/
+
+# Pre-commit
+.pre-commit-config.yaml.bak
+
+# Performance profiling
+*.prof
+*.lprof
+*.stats
+
+# Security reports
+reports/
+security-report.json
+bandit-report.json
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Local configuration
+config/local.py
+config/local_*.py
+local_settings.py
 
 # API keys and secrets
 *.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
+config/secrets/
+
+# Large files (over 100MB)
+*.h5
+*.hdf5
+*.parquet
+*.feather
+*.arrow
+*.bin
+*.model
+*.weights
+
+# Node.js (if using any frontend tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backup and archive files
+*.tar
+*.tar.gz
+*.tar.bz2
+*.zip
+*.rar
+*.7z
+
+# System files
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Application specific
+*.pid
+*.seed
+*.pid.lock
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
