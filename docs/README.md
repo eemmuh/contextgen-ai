@@ -1,7 +1,5 @@
 # Image Model COCO - Documentation
 
-Welcome to the Image Model COCO project documentation. This project implements a Retrieval-Augmented Generation (RAG) system for image generation using the COCO dataset.
-
 ## 📚 Documentation Index
 
 ### Getting Started

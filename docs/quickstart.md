@@ -1,7 +1,5 @@
 # Quick Start Guide
 
-Get up and running with Image Model COCO in 5 minutes!
-
 ## ⚡ Quick Setup
 
 ### 1. Install Dependencies
