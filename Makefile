@@ -163,9 +163,36 @@ docs-build: ## Build documentation
 docs-serve: ## Serve documentation locally
 	cd docs && python -m http.server 8000
 
+# API commands
+api-run: ## Run the FastAPI server
+	python -m src.api.app
+
+api-dev: ## Run the FastAPI server in development mode
+	uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
+
+api-docs: ## Open API documentation
+	@echo "Opening API documentation at http://localhost:8000/docs"
+	@open http://localhost:8000/docs || xdg-open http://localhost:8000/docs || echo "Please open http://localhost:8000/docs manually"
+
+# Testing enhancements
+test-integration-db: ## Run database integration tests
+	pytest tests/test_database_integration.py -v
+
+test-api: ## Run API tests
+	pytest tests/test_api.py -v
+
+test-all: test test-integration-db test-api ## Run all tests including integration and API tests
+
+# Configuration management
+config-validate: ## Validate configuration settings
+	python -c "from config.settings import get_settings; print('Configuration is valid')"
+
+config-show: ## Show current configuration
+	python -c "from config.settings import get_settings; import json; print(json.dumps(get_settings().dict(), indent=2, default=str))"
+
 # Complete development setup
 dev-setup-complete: dev-install pre-commit-install ## Complete development environment setup
-	@echo "🎉 Complete development environment ready!"
+	@echo "Complete development environment ready!"
 	@echo "Installed:"
 	@echo "  ✅ Development dependencies"
 	@echo "  ✅ Pre-commit hooks"
@@ -174,6 +201,8 @@ dev-setup-complete: dev-install pre-commit-install ## Complete development envir
 	@echo "Next steps:"
 	@echo "1. Run 'make docker-up' to start database"
 	@echo "2. Run 'make setup-db' to setup database"
-	@echo "3. Run 'make test' to run tests"
+	@echo "3. Run 'make test-all' to run all tests"
 	@echo "4. Run 'make lint' to check code style"
-	@echo "5. Run 'make format' to format code" 
+	@echo "5. Run 'make format' to format code"
+	@echo "6. Run 'make api-dev' to start API server"
+	@echo "7. Run 'make api-docs' to view API documentation" 
