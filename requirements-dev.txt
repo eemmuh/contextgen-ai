@@ -38,4 +38,7 @@ types-PyYAML>=6.0.0
 
 # Database testing
 pytest-postgresql>=4.1.0
-pytest-docker>=2.0.0 
+pytest-docker>=2.0.0
+
+# API testing
+httpx>=0.25.0  # For FastAPI testing 
