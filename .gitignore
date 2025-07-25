@@ -1,307 +1,180 @@
-# Environment variables and secrets
-.env
-.env.local
-.env.*.local
-*.key
-*.pem
-secrets/
-
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
+
+# Distribution / packaging
 .Python
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
 *.egg-info/
-.pytest_cache/
-.coverage
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
 htmlcov/
 .tox/
 .nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
 coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+.pytest_cache/
+cover/
 
-# Virtual environments
-venv/
-.venv/
-env/
-ENV/
-env.bak/
-venv.bak/
+# Translations
+*.mo
+*.pot
 
-# Data directories and datasets
-data/
-output/
-embeddings/
-*.pkl
-*.pickle
-*.h5
-*.hdf5
-*.parquet
-*.feather
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
 
-# Generated images and media
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.bmp
-*.tiff
-*.webp
-*.svg
+# Flask stuff
+instance/
+.webassets-cache
 
-# Machine Learning / AI specific
-*.pth
-*.pt
-*.bin
-*.safetensors
-*.onnx
-*.tflite
-*.pb
-logs/
-models/
-checkpoints/
-runs/
-wandb/
+# Scrapy stuff
+.scrapy
 
-# COCO dataset specific
-data/coco/
-data/images/
-data/annotations/
-data/train2017/
-data/val2017/
-data/test2017/
-*.zip
-*.tar.gz
-*.tar.bz2
+# Sphinx documentation
+docs/_build/
 
-# Model downloads and cache
-.cache/
-.transformers_cache/
-.huggingface/
-torch/hub/
-.model_cache/
-sentence_transformers_cache/
-clip_cache/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-postgres_data/
-mysql_data/
-
-# Docker
-.dockerignore
-docker-compose.override.yml
-
-# IDE and editors
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.settings/
-*.sublime-project
-*.sublime-workspace
-
-# OS specific
-.DS_Store
-._*
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.lnk
+# PyBuilder
+.pybuilder/
+target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
-*.ipynb
 
-# Temporary files
-*.log
-*.tmp
-*.temp
-tmp/
-temp/
-.tmp/
+# IPython
+profile_default/
+ipython_config.py
 
-# FAISS indices and embeddings
-*.index
-*.metadata
-*.faiss
-faiss_index/
-faiss_metadata/
+# pyenv
+# .python-version
 
-# Development and testing
-.pytest_cache/
+# pipenv
+# Pipfile.lock
+
+# poetry
+# poetry.lock
+
+# pdm
+.pdm.toml
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.uv/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
 .mypy_cache/
 .dmypy.json
 dmypy.json
-.ruff_cache/
-.mypy_cache/
+
+# Pyre type checker
 .pyre/
+
+# pytype static type analyzer
 .pytype/
 
-# Documentation builds
-docs/_build/
-docs/build/
-site/
+# Cython debug symbols
+cython_debug/
 
-# Pre-commit
-.pre-commit-config.yaml.bak
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
 
-# Performance profiling
-*.prof
-*.lprof
-*.stats
-
-# Security reports
-reports/
-security-report.json
-bandit-report.json
-
-# Backup files
-*.bak
-*.backup
-*.old
-*.orig
-
-# Local configuration
-config/local.py
-config/local_*.py
-local_settings.py
-
-# API keys and secrets
-*.key
-*.pem
-*.p12
-*.pfx
-secrets/
-credentials/
-config/secrets/
-
-# Large files (over 100MB)
-*.h5
-*.hdf5
-*.parquet
-*.feather
-*.arrow
-*.bin
-*.model
-*.weights
-
-# Node.js (if using any frontend tools)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Backup and archive files
-*.tar
-*.tar.gz
-*.tar.bz2
-*.zip
-*.rar
-*.7z
-
-# System files
-.fuse_hidden*
-.directory
-.Trash-*
-.nfs*
-
-# Application specific
-*.pid
-*.seed
-*.pid.lock
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env.test
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
-dist
-
-# Gatsby files
-.cache/
-public
-
-# Storybook build outputs
-.out
-.storybook-out
-
-# Temporary folders
-tmp/
-temp/
-
-# Editor directories and files
-.vscode/*
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 !.vscode/extensions.json
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+# Project-specific ignores
+.model_cache/
+*.log
+logs/
+reports/
+output/
+uploads/
+analytics/
+backups/
+embeddings/
+data/
+data/raw/
+data/processed/
+data/models/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
 
 # OS generated files
 .DS_Store
@@ -311,4 +184,64 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# API keys and secrets
+.env.local
+.env.production
+.env.staging
+secrets.json
+config/secrets.py
+
+# ML model files (large files)
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+*.onnx
+*.pb
+*.tflite
+*.pt
+*.pth
+
+# Generated images and media
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.webp
+*.mp4
+*.avi
+*.mov
+*.wmv
+
+# Keep example outputs and test fixtures
+!examples/output/*.png
+!docs/images/*.png
+!tests/fixtures/*.png
+
+# Performance profiling
+*.prof
+*.lprof
+
+# Jupyter notebook outputs
+*.ipynb
+
+# Documentation builds
+docs/_build/
+docs/build/
+
+# Pre-commit
+.pre-commit-config.yaml.bak
+
+# Local development
+local_config.py
+local_settings.py
 
