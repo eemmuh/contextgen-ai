@@ -157,9 +157,7 @@ class ModelCache:
             return {k: self._make_json_serializable(v) for k, v in obj.items()}
         elif isinstance(obj, (list, tuple)):
             return [self._make_json_serializable(v) for v in obj]
-        elif hasattr(obj, "dtype") or (
-            hasattr(obj, "__class__") and obj.__class__.__module__ == "torch"
-        ):
+        elif hasattr(obj, "dtype") or (hasattr(obj, "__class__") and obj.__class__.__module__ == "torch"):
             return str(obj)
         elif isinstance(obj, (bytes, bytearray)):
             return obj.decode(errors="replace")
@@ -190,15 +188,11 @@ class ModelCache:
         try:
             if hasattr(model, "state_dict"):
                 # PyTorch model
-                total_params = sum(
-                    p.numel() * p.element_size() for p in model.parameters()
-                )
+                total_params = sum(p.numel() * p.element_size() for p in model.parameters())
                 return total_params
             elif hasattr(model, "get_sentence_embedding_dimension"):
                 # SentenceTransformer
-                return (
-                    model.get_sentence_embedding_dimension() * 4 * 1024
-                )  # Rough estimate
+                return model.get_sentence_embedding_dimension() * 4 * 1024  # Rough estimate
             else:
                 # Generic estimate
                 return 100 * 1024 * 1024  # 100MB default
@@ -209,10 +203,7 @@ class ModelCache:
         """Evict entries if cache limits are exceeded."""
         with self._lock:
             # Check memory cache
-            while (
-                self._memory_cache_size + required_size > self.max_memory_size
-                and self._memory_cache
-            ):
+            while self._memory_cache_size + required_size > self.max_memory_size and self._memory_cache:
                 # Remove least recently used entry
                 key, entry = self._memory_cache.popitem(last=False)
                 self._memory_cache_size -= entry.size_bytes
@@ -265,9 +256,7 @@ class ModelCache:
             cache_path = self.cache_dir / cache_key
             if cache_path.exists():
                 try:
-                    total_size += sum(
-                        f.stat().st_size for f in cache_path.rglob("*") if f.is_file()
-                    )
+                    total_size += sum(f.stat().st_size for f in cache_path.rglob("*") if f.is_file())
                 except Exception:
                     pass
         return total_size
@@ -309,9 +298,7 @@ class ModelCache:
     ) -> Optional[Any]:
         """Get a cached model if available."""
         with self._lock:
-            cache_key = self._get_cache_key(
-                model_type, model_name, device=device, **kwargs
-            )
+            cache_key = self._get_cache_key(model_type, model_name, device=device, **kwargs)
             self.stats["total_requests"] += 1
 
             # Check in-memory cache first
@@ -329,13 +316,9 @@ class ModelCache:
             if cache_path.exists() and cache_key in self.metadata:
                 try:
                     logger.info(f"💾 Loading from disk cache: {model_name}")
-                    model = self._load_model_from_disk(
-                        model_type, cache_path, device, **kwargs
-                    )
+                    model = self._load_model_from_disk(model_type, cache_path, device, **kwargs)
 
-                    if model is not None and self._validate_cached_model(
-                        model, model_type
-                    ):
+                    if model is not None and self._validate_cached_model(model, model_type):
                         # Create cache entry
                         entry = CacheEntry(
                             model=model,
@@ -354,9 +337,7 @@ class ModelCache:
 
                         # Update metadata
                         self.metadata[cache_key]["last_accessed"] = time.time()
-                        self.metadata[cache_key]["access_count"] = (
-                            self.metadata[cache_key].get("access_count", 0) + 1
-                        )
+                        self.metadata[cache_key]["access_count"] = self.metadata[cache_key].get("access_count", 0) + 1
                         self._save_metadata()
 
                         self.stats["cache_hits"] += 1
@@ -382,9 +363,7 @@ class ModelCache:
     ):
         """Cache a model in memory and on disk."""
         with self._lock:
-            cache_key = self._get_cache_key(
-                model_type, model_name, device=device, **kwargs
-            )
+            cache_key = self._get_cache_key(model_type, model_name, device=device, **kwargs)
 
             # Create cache entry
             entry = CacheEntry(
@@ -425,9 +404,7 @@ class ModelCache:
             except Exception as e:
                 logger.error(f"Failed to cache model to disk: {e}")
 
-    def _save_model_to_disk(
-        self, model: Any, model_type: str, cache_path: Path, **kwargs
-    ):
+    def _save_model_to_disk(self, model: Any, model_type: str, cache_path: Path, **kwargs):
         """Save a model to disk cache with optional compression."""
         cache_path.mkdir(exist_ok=True)
 
@@ -479,9 +456,7 @@ class ModelCache:
         except Exception as e:
             logger.warning(f"Failed to decompress cache directory: {e}")
 
-    def _load_model_from_disk(
-        self, model_type: str, cache_path: Path, device: str, **kwargs
-    ) -> Optional[Any]:
+    def _load_model_from_disk(self, model_type: str, cache_path: Path, device: str, **kwargs) -> Optional[Any]:
         """Load a model from disk cache."""
         try:
             # Decompress if needed
@@ -504,12 +479,8 @@ class ModelCache:
             elif model_type == "stable_diffusion":
                 from diffusers import StableDiffusionPipeline
 
-                torch_dtype = kwargs.get(
-                    "torch_dtype", torch.float16 if device == "cuda" else torch.float32
-                )
-                pipeline = StableDiffusionPipeline.from_pretrained(
-                    str(cache_path), torch_dtype=torch_dtype
-                )
+                torch_dtype = kwargs.get("torch_dtype", torch.float16 if device == "cuda" else torch.float32)
+                pipeline = StableDiffusionPipeline.from_pretrained(str(cache_path), torch_dtype=torch_dtype)
                 return pipeline.to(device)
 
             else:
@@ -563,11 +534,7 @@ class ModelCache:
         with self._lock:
             # Calculate hit rate
             total_requests = self.stats["total_requests"]
-            hit_rate = (
-                (self.stats["cache_hits"] / total_requests * 100)
-                if total_requests > 0
-                else 0
-            )
+            hit_rate = (self.stats["cache_hits"] / total_requests * 100) if total_requests > 0 else 0
 
             # Get cached models info
             cached_models = {}
@@ -585,10 +552,8 @@ class ModelCache:
                 "disk_cache_size": len(self.metadata),
                 "disk_cache_size_bytes": self._get_disk_cache_size(),
                 "disk_cache_size_mb": self._get_disk_cache_size() / (1024 * 1024),
-                "total_size_bytes": self._memory_cache_size
-                + self._get_disk_cache_size(),
-                "total_size_mb": (self._memory_cache_size + self._get_disk_cache_size())
-                / (1024 * 1024),
+                "total_size_bytes": self._memory_cache_size + self._get_disk_cache_size(),
+                "total_size_mb": (self._memory_cache_size + self._get_disk_cache_size()) / (1024 * 1024),
                 "cached_models": cached_models,
                 "hit_rate_percent": hit_rate,
                 "total_requests": total_requests,
@@ -609,25 +574,17 @@ class ModelCache:
             try:
                 model_type = config["model_type"]
                 model_name = config["model_name"]
-                device = config.get(
-                    "device", "cuda" if torch.cuda.is_available() else "cpu"
-                )
+                device = config.get("device", "cuda" if torch.cuda.is_available() else "cpu")
 
                 # Try to load and cache the model
-                cached_model = self.get_cached_model(
-                    model_type, model_name, device, **config.get("kwargs", {})
-                )
+                cached_model = self.get_cached_model(model_type, model_name, device, **config.get("kwargs", {}))
                 if cached_model is None:
-                    logger.info(
-                        f"Model {model_name} not in cache, will be loaded on first use"
-                    )
+                    logger.info(f"Model {model_name} not in cache, will be loaded on first use")
                 else:
                     logger.info(f"Successfully warmed up {model_name}")
 
             except Exception as e:
-                logger.warning(
-                    f"Failed to warmup {config.get('model_name', 'unknown')}: {e}"
-                )
+                logger.warning(f"Failed to warmup {config.get('model_name', 'unknown')}: {e}")
 
     def reset_stats(self):
         """Reset cache statistics."""
@@ -653,9 +610,7 @@ class ModelCache:
             for cache_key in keys_to_remove:
                 self._remove_cache_entry(cache_key)
 
-            logger.info(
-                f"Optimization complete: removed {len(keys_to_remove)} old entries"
-            )
+            logger.info(f"Optimization complete: removed {len(keys_to_remove)} old entries")
 
 
 # Global cache instance

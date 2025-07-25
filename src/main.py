@@ -34,9 +34,7 @@ def process_dataset(
     if dataset_type == "coco":
         dataset = COCODataset(coco_dir=dataset_path, max_images=max_images)
     else:
-        dataset = ImageMetadataDataset(
-            image_dir=dataset_path, metadata_path=metadata_path, max_images=max_images
-        )
+        dataset = ImageMetadataDataset(image_dir=dataset_path, metadata_path=metadata_path, max_images=max_images)
 
     # Initialize embedding manager if not provided
     if embedding_manager is None:
@@ -77,30 +75,18 @@ def main():
         default="coco",
         help="Type of dataset to use",
     )
-    parser.add_argument(
-        "--dataset", type=str, default="data/coco", help="Path to dataset directory"
-    )
-    parser.add_argument(
-        "--metadata", type=str, help="Path to metadata CSV (for custom dataset)"
-    )
-    parser.add_argument(
-        "--num-images", type=int, default=1, help="Number of images to generate"
-    )
+    parser.add_argument("--dataset", type=str, default="data/coco", help="Path to dataset directory")
+    parser.add_argument("--metadata", type=str, help="Path to metadata CSV (for custom dataset)")
+    parser.add_argument("--num-images", type=int, default=1, help="Number of images to generate")
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
-    parser.add_argument(
-        "--fast-mode", action="store_true", help="Use fast generation mode (10 steps)"
-    )
+    parser.add_argument("--fast-mode", action="store_true", help="Use fast generation mode (10 steps)")
     parser.add_argument(
         "--process-dataset",
         action="store_true",
         help="Process the dataset and create embeddings",
     )
-    parser.add_argument(
-        "--max-images", type=int, help="Maximum number of images to process"
-    )
-    parser.add_argument(
-        "--cache-info", action="store_true", help="Show model cache information"
-    )
+    parser.add_argument("--max-images", type=int, help="Maximum number of images to process")
+    parser.add_argument("--cache-info", action="store_true", help="Show model cache information")
     parser.add_argument(
         "--clear-cache",
         type=str,
@@ -120,12 +106,10 @@ def main():
         print("📊 Model Cache Information:")
         print(f"   Memory cache size: {cache_info['memory_cache_size']} models")
         print(f"   Disk cache size: {cache_info['disk_cache_size']} models")
-        print(
-            f"   Total cache size: {cache_info['total_size_bytes'] / (1024*1024):.2f} MB"
-        )
+        print(f"   Total cache size: {cache_info['total_size_bytes'] / (1024*1024):.2f} MB")
         print("   Cached models:")
         for model_type, model_names in cache_info["cached_models"].items():
-            model_names_str = ', '.join(model_names)
+            model_names_str = ", ".join(model_names)
             print("     - {}: {}".format(model_type, model_names_str))
         return
 
@@ -168,9 +152,7 @@ def main():
                 continue
 
         if not embedding_loaded:
-            print(
-                f"❌ No existing embeddings found. Please run with --process-dataset first."
-            )
+            print(f"❌ No existing embeddings found. Please run with --process-dataset first.")
             return
 
     # Initialize RAG and image generation components

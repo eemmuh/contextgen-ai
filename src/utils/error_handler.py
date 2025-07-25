@@ -85,17 +85,13 @@ class CircuitBreaker:
 
             if self.failure_count >= self.failure_threshold:
                 self.state = "OPEN"
-                logger.warning(
-                    f"Circuit breaker opened after {self.failure_count} failures"
-                )
+                logger.warning(f"Circuit breaker opened after {self.failure_count} failures")
 
 
 class RetryHandler:
     """Retry logic with exponential backoff."""
 
-    def __init__(
-        self, max_retries: int = 3, base_delay: float = 1.0, max_delay: float = 60.0
-    ):
+    def __init__(self, max_retries: int = 3, base_delay: float = 1.0, max_delay: float = 60.0):
         """
         Initialize retry handler.
 
@@ -120,9 +116,7 @@ class RetryHandler:
 
                 if attempt < self.max_retries:
                     delay = min(self.base_delay * (2**attempt), self.max_delay)
-                    logger.warning(
-                        f"Attempt {attempt + 1} failed, retrying in {delay:.1f}s: {str(e)}"
-                    )
+                    logger.warning(f"Attempt {attempt + 1} failed, retrying in {delay:.1f}s: {str(e)}")
                     time.sleep(delay)
                 else:
                     logger.error(f"All {self.max_retries + 1} attempts failed")
@@ -152,9 +146,7 @@ class ErrorHandler:
 
         return decorator
 
-    def _execute_with_error_handling(
-        self, func: Callable, context: ErrorContext, *args, **kwargs
-    ) -> Any:
+    def _execute_with_error_handling(self, func: Callable, context: ErrorContext, *args, **kwargs) -> Any:
         """Execute function with comprehensive error handling."""
         start_time = time.time()
 
@@ -183,17 +175,13 @@ class ErrorHandler:
                             )
 
                 retry_handler = self.retry_handlers[circuit_breaker_key]
-                result = retry_handler.execute(
-                    circuit_breaker.call, func, *args, **kwargs
-                )
+                result = retry_handler.execute(circuit_breaker.call, func, *args, **kwargs)
             else:
                 result = circuit_breaker.call(func, *args, **kwargs)
 
             # Log success
             duration = time.time() - start_time
-            logger.info(
-                f"Operation {context.operation} completed successfully in {duration:.3f}s"
-            )
+            logger.info(f"Operation {context.operation} completed successfully in {duration:.3f}s")
 
             return result
 
@@ -232,38 +220,26 @@ class ErrorHandler:
             stats["last_error_time"] = time.time()
 
             error_type = type(error).__name__
-            stats["error_types"][error_type] = (
-                stats["error_types"].get(error_type, 0) + 1
-            )
+            stats["error_types"][error_type] = stats["error_types"].get(error_type, 0) + 1
 
             severity = context.severity.value
-            stats["severity_counts"][severity] = (
-                stats["severity_counts"].get(severity, 0) + 1
-            )
+            stats["severity_counts"][severity] = stats["severity_counts"].get(severity, 0) + 1
 
     def _handle_error_by_severity(self, context: ErrorContext, error: Exception):
         """Handle error based on severity level."""
         if context.severity == ErrorSeverity.CRITICAL:
-            logger.critical(
-                f"CRITICAL ERROR in {context.component}.{context.operation}: {str(error)}"
-            )
+            logger.critical(f"CRITICAL ERROR in {context.component}.{context.operation}: {str(error)}")
             # Could trigger alerts, shutdown procedures, etc.
 
         elif context.severity == ErrorSeverity.HIGH:
-            logger.error(
-                f"HIGH severity error in {context.component}.{context.operation}: {str(error)}"
-            )
+            logger.error(f"HIGH severity error in {context.component}.{context.operation}: {str(error)}")
             # Could trigger monitoring alerts
 
         elif context.severity == ErrorSeverity.MEDIUM:
-            logger.warning(
-                f"Medium severity error in {context.component}.{context.operation}: {str(error)}"
-            )
+            logger.warning(f"Medium severity error in {context.component}.{context.operation}: {str(error)}")
 
         else:  # LOW
-            logger.info(
-                f"Low severity error in {context.component}.{context.operation}: {str(error)}"
-            )
+            logger.info(f"Low severity error in {context.component}.{context.operation}: {str(error)}")
 
     def get_error_stats(self) -> Dict[str, Dict]:
         """Get error statistics."""
@@ -315,9 +291,7 @@ def with_fallback(fallback_func: Callable):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                logger.warning(
-                    f"Primary function {func.__name__} failed, using fallback: {str(e)}"
-                )
+                logger.warning(f"Primary function {func.__name__} failed, using fallback: {str(e)}")
                 return fallback_func(*args, **kwargs)
 
         return wrapper

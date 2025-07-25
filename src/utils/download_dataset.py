@@ -96,9 +96,7 @@ class PexelsDatasetDownloader:
 
         # Save metadata
         df = pd.DataFrame(metadata)
-        df.to_csv(
-            os.path.join(os.path.dirname(output_dir), "metadata.csv"), index=False
-        )
+        df.to_csv(os.path.join(os.path.dirname(output_dir), "metadata.csv"), index=False)
         print(f"\nDataset created successfully with {len(metadata)} images!")
 
 

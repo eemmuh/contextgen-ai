@@ -37,9 +37,7 @@ class EmbeddingManager:
         self.text_model = self._load_text_model(text_model_name)
 
         print(f"🔄 Loading image model: {image_model_name}")
-        self.image_model, self.image_processor = self._load_image_model(
-            image_model_name
-        )
+        self.image_model, self.image_processor = self._load_image_model(image_model_name)
 
         # Initialize FAISS index
         self.index = faiss.IndexFlatL2(embedding_dim)
@@ -72,9 +70,7 @@ class EmbeddingManager:
     def _load_image_model(self, model_name: str) -> tuple[CLIPModel, CLIPProcessor]:
         """Load image model with caching."""
         # Try to get from cache first
-        cached_model = self.model_cache.get_cached_model(
-            model_type="clip", model_name=model_name, device=self.device
-        )
+        cached_model = self.model_cache.get_cached_model(model_type="clip", model_name=model_name, device=self.device)
 
         if cached_model is not None:
             # For CLIP, we need to handle processor separately
@@ -90,9 +86,7 @@ class EmbeddingManager:
         model.processor = processor
 
         # Cache the model
-        self.model_cache.cache_model(
-            model=model, model_type="clip", model_name=model_name, device=self.device
-        )
+        self.model_cache.cache_model(model=model, model_type="clip", model_name=model_name, device=self.device)
 
         return model, processor
 
@@ -110,15 +104,11 @@ class EmbeddingManager:
             # Project CLIP's 512-dim features to match text embedding dimension
             image_features = torch.nn.functional.linear(
                 image_features,
-                torch.randn(
-                    self.embedding_dim, image_features.shape[-1], device=self.device
-                ),
+                torch.randn(self.embedding_dim, image_features.shape[-1], device=self.device),
             )
             return image_features.cpu().numpy()
 
-    def add_to_index(
-        self, embedding: np.ndarray, metadata: Dict, image_path: Optional[str] = None
-    ) -> int:
+    def add_to_index(self, embedding: np.ndarray, metadata: Dict, image_path: Optional[str] = None) -> int:
         """
         Add an embedding to the FAISS index along with its metadata.
 
@@ -151,9 +141,7 @@ class EmbeddingManager:
                     {
                         "metadata": self.metadata_store[idx]["metadata"],
                         "image_path": self.metadata_store[idx]["image_path"],
-                        "similarity_score": float(
-                            1 / (1 + dist)
-                        ),  # Convert distance to similarity
+                        "similarity_score": float(1 / (1 + dist)),  # Convert distance to similarity
                     }
                 )
 

@@ -38,11 +38,7 @@ class RAGManager:
         results = self.embedding_manager.search(query_embedding, k=self.num_examples)
 
         # Filter results based on similarity threshold
-        filtered_results = [
-            result
-            for result in results
-            if result["similarity_score"] >= self.similarity_threshold
-        ]
+        filtered_results = [result for result in results if result["similarity_score"] >= self.similarity_threshold]
 
         return filtered_results
 
@@ -94,9 +90,7 @@ class RAGManager:
         # Add scene context
         if scene_info:
             unique_scenes = list(set(scene_info))
-            scene_text = (
-                f"in {', '.join(unique_scenes[:2])} setting"  # Limit to 2 scenes
-            )
+            scene_text = f"in {', '.join(unique_scenes[:2])} setting"  # Limit to 2 scenes
             augmented_parts.append(scene_text)
 
         # Add relevant objects that aren't already in the query
@@ -104,9 +98,7 @@ class RAGManager:
             unique_objects = list(set(object_info))
             # Filter out objects already mentioned in the query
             query_lower = query.lower()
-            new_objects = [
-                obj for obj in unique_objects[:3] if obj.lower() not in query_lower
-            ]
+            new_objects = [obj for obj in unique_objects[:3] if obj.lower() not in query_lower]
 
             if new_objects:
                 object_text = f"with {', '.join(new_objects)}"

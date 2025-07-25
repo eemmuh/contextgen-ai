@@ -39,9 +39,7 @@ class COCODatasetDownloader:
             filepath = os.path.join(self.data_dir, filename)
 
             with open(filepath, "wb") as file:
-                with tqdm(
-                    total=total_size, unit="B", unit_scale=True, desc=filename
-                ) as pbar:
+                with tqdm(total=total_size, unit="B", unit_scale=True, desc=filename) as pbar:
                     for chunk in response.iter_content(chunk_size=8192):
                         if chunk:
                             file.write(chunk)
@@ -115,9 +113,7 @@ class COCODatasetDownloader:
         annotations_path = os.path.join(self.data_dir, annotations_zip)
 
         # Check if annotations already exist
-        if os.path.exists(
-            os.path.join(self.data_dir, "annotations", "instances_train2017.json")
-        ):
+        if os.path.exists(os.path.join(self.data_dir, "annotations", "instances_train2017.json")):
             print("Annotations already exist, skipping download.")
             return True
 

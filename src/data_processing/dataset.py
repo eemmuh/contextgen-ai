@@ -24,9 +24,7 @@ class ImageMetadataDataset(Dataset):
             max_images: Maximum number of images to load (for testing)
         """
         self.image_dir = image_dir
-        self.processor = processor or self._load_clip_processor(
-            "openai/clip-vit-base-patch32"
-        )
+        self.processor = processor or self._load_clip_processor("openai/clip-vit-base-patch32")
 
         # Load metadata
         self.metadata = pd.read_csv(metadata_path)
@@ -66,18 +64,12 @@ class ImageMetadataDataset(Dataset):
 
         # Load and process image
         image = Image.open(image_path).convert("RGB")
-        processed_image = self.processor(images=image, return_tensors="pt")[
-            "pixel_values"
-        ][0]
+        processed_image = self.processor(images=image, return_tensors="pt")["pixel_values"][0]
 
         # Extract metadata
         metadata = {
             "description": row.get("description", ""),
-            "tags": (
-                row.get("tags", "").split(",")
-                if isinstance(row.get("tags"), str)
-                else []
-            ),
+            "tags": (row.get("tags", "").split(",") if isinstance(row.get("tags"), str) else []),
             "style": row.get("style", ""),
             "category": row.get("category", ""),
         }

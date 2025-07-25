@@ -58,9 +58,7 @@ class ImageGenerator:
 
         # Load from HuggingFace and cache
         print(f"📥 Downloading Stable Diffusion model: {model_id}")
-        pipeline = StableDiffusionPipeline.from_pretrained(
-            model_id, torch_dtype=torch_dtype
-        )
+        pipeline = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch_dtype)
         pipeline = pipeline.to(self.device)
 
         # Cache the model
@@ -115,9 +113,7 @@ class ImageGenerator:
 
         return images
 
-    def save_images(
-        self, images: List[Image.Image], output_dir: str, prefix: str = "generated"
-    ) -> List[str]:
+    def save_images(self, images: List[Image.Image], output_dir: str, prefix: str = "generated") -> List[str]:
         """
         Save generated images to disk.
 

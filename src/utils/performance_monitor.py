@@ -73,9 +73,7 @@ class PerformanceMonitor:
             return
 
         self._monitoring = True
-        self._monitor_thread = threading.Thread(
-            target=self._background_monitor, args=(interval,), daemon=True
-        )
+        self._monitor_thread = threading.Thread(target=self._background_monitor, args=(interval,), daemon=True)
         self._monitor_thread.start()
         logger.info(f"Background monitoring started with {interval}s interval")
 
@@ -140,12 +138,8 @@ class PerformanceMonitor:
                 gpu_metrics = {}
                 for i in range(torch.cuda.device_count()):
                     gpu_metrics[f"gpu_{i}"] = {
-                        "memory_allocated_mb": torch.cuda.memory_allocated(i)
-                        / 1024
-                        / 1024,
-                        "memory_reserved_mb": torch.cuda.memory_reserved(i)
-                        / 1024
-                        / 1024,
+                        "memory_allocated_mb": torch.cuda.memory_allocated(i) / 1024 / 1024,
+                        "memory_reserved_mb": torch.cuda.memory_reserved(i) / 1024 / 1024,
                         "memory_free_mb": torch.cuda.memory_reserved(i) / 1024 / 1024
                         - torch.cuda.memory_allocated(i) / 1024 / 1024,
                     }
@@ -161,17 +155,13 @@ class PerformanceMonitor:
         def decorator(func: Callable) -> Callable:
             @functools.wraps(func)
             def wrapper(*args, **kwargs) -> Any:
-                return self._monitor_function_call(
-                    func, operation, component, *args, **kwargs
-                )
+                return self._monitor_function_call(func, operation, component, *args, **kwargs)
 
             return wrapper
 
         return decorator
 
-    def _monitor_function_call(
-        self, func: Callable, operation: str, component: str, *args, **kwargs
-    ) -> Any:
+    def _monitor_function_call(self, func: Callable, operation: str, component: str, *args, **kwargs) -> Any:
         """Monitor a function call and record metrics."""
         start_time = time.time()
 
@@ -287,16 +277,13 @@ class PerformanceMonitor:
             for component, metrics in self.component_metrics.items():
                 if metrics:
                     comp_durations = [m.duration for m in metrics]
-                    comp_memory_deltas = [
-                        m.memory_after - m.memory_before for m in metrics
-                    ]
+                    comp_memory_deltas = [m.memory_after - m.memory_before for m in metrics]
 
                     summary["components"][component] = {
                         "operation_count": len(metrics),
                         "avg_duration": sum(comp_durations) / len(comp_durations),
                         "max_duration": max(comp_durations),
-                        "avg_memory_delta": sum(comp_memory_deltas)
-                        / len(comp_memory_deltas),
+                        "avg_memory_delta": sum(comp_memory_deltas) / len(comp_memory_deltas),
                         "max_memory_delta": max(comp_memory_deltas),
                     }
 

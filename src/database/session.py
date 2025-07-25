@@ -13,10 +13,7 @@ from src.utils.logger import get_logger
 logger = get_logger("database")
 
 # Database configuration
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "postgresql://postgres:password@localhost:5433/image_rag_db"
-)
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5433/image_rag_db")
 
 # Engine configuration
 engine = create_engine(
@@ -26,7 +23,7 @@ engine = create_engine(
     max_overflow=20,
     pool_pre_ping=True,
     pool_recycle=3600,  # Recycle connections after 1 hour
-    echo=os.getenv("DB_ECHO", "false").lower() == "true"  # SQL logging
+    echo=os.getenv("DB_ECHO", "false").lower() == "true",  # SQL logging
 )
 
 # Session factory
@@ -42,7 +39,7 @@ def get_db_session() -> Session:
 def get_db_session_context() -> Generator[Session, None, None]:
     """
     Context manager for database sessions with automatic cleanup.
-    
+
     Usage:
         with get_db_session_context() as session:
             # Use session
@@ -57,6 +54,7 @@ def get_db_session_context() -> Generator[Session, None, None]:
         logger.error(f"Database session error: {e}")
         logger.error(f"Error type: {type(e)}")
         import traceback
+
         logger.error(f"Traceback: {traceback.format_exc()}")
         raise
     finally:
@@ -68,6 +66,7 @@ def test_connection() -> bool:
     try:
         with get_db_session_context() as session:
             from sqlalchemy import text
+
             session.execute(text("SELECT 1"))
         logger.info("Database connection successful")
         return True
@@ -79,7 +78,7 @@ def test_connection() -> bool:
 def create_tables():
     """Create all database tables."""
     from .models import Base
-    
+
     try:
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables created successfully")
@@ -91,10 +90,10 @@ def create_tables():
 def drop_tables():
     """Drop all database tables (use with caution!)."""
     from .models import Base
-    
+
     try:
         Base.metadata.drop_all(bind=engine)
         logger.warning("Database tables dropped successfully")
     except Exception as e:
         logger.error(f"Failed to drop database tables: {e}")
-        raise 
+        raise

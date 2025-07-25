@@ -19,7 +19,7 @@ class DatabaseEmbeddingManager:
     """
     Database-backed embedding manager that stores embeddings in PostgreSQL with pgvector.
     """
-    
+
     def __init__(
         self,
         text_model_name: str = "all-MiniLM-L6-v2",
@@ -79,9 +79,7 @@ class DatabaseEmbeddingManager:
     def _load_image_model(self, model_name: str) -> tuple[CLIPModel, CLIPProcessor]:
         """Load image model with caching."""
         # Try to get from cache first
-        cached_model = self.model_cache.get_cached_model(
-            model_type="clip", model_name=model_name, device=self.device
-        )
+        cached_model = self.model_cache.get_cached_model(model_type="clip", model_name=model_name, device=self.device)
 
         if cached_model is not None:
             # For CLIP, we need to handle processor separately
@@ -97,9 +95,7 @@ class DatabaseEmbeddingManager:
         model.processor = processor
 
         # Cache the model
-        self.model_cache.cache_model(
-            model=model, model_type="clip", model_name=model_name, device=self.device
-        )
+        self.model_cache.cache_model(model=model, model_type="clip", model_name=model_name, device=self.device)
 
         return model, processor
 
@@ -117,9 +113,7 @@ class DatabaseEmbeddingManager:
             # Project CLIP's 512-dim features to match text embedding dimension
             image_features = torch.nn.functional.linear(
                 image_features,
-                torch.randn(
-                    self.embedding_dim, image_features.shape[-1], device=self.device
-                ),
+                torch.randn(self.embedding_dim, image_features.shape[-1], device=self.device),
             )
             return image_features.cpu().numpy()
 
@@ -128,7 +122,7 @@ class DatabaseEmbeddingManager:
         image_path: str,
         metadata: Dict[str, Any],
         compute_embeddings: bool = True,
-        embedding_types: List[str] = None
+        embedding_types: List[str] = None,
     ) -> int:
         """
         Add an image to the database with optional embeddings.
@@ -145,38 +139,38 @@ class DatabaseEmbeddingManager:
         # Add image to database
         image_id = self.database_manager.add_image(
             image_path=image_path,
-            description=metadata.get('description'),
-            tags=metadata.get('tags', []),
-            width=metadata.get('width'),
-            height=metadata.get('height'),
-            file_size_bytes=metadata.get('file_size_bytes'),
-            format=metadata.get('format'),
-            source_dataset=metadata.get('source_dataset')
+            description=metadata.get("description"),
+            tags=metadata.get("tags", []),
+            width=metadata.get("width"),
+            height=metadata.get("height"),
+            file_size_bytes=metadata.get("file_size_bytes"),
+            format=metadata.get("format"),
+            source_dataset=metadata.get("source_dataset"),
         )
 
         if compute_embeddings:
-            embedding_types = embedding_types or ['text']
-            
+            embedding_types = embedding_types or ["text"]
+
             for embedding_type in embedding_types:
-                if embedding_type == 'text':
+                if embedding_type == "text":
                     # Compute text embedding from metadata
                     metadata_text = self._format_metadata_text(metadata)
                     text_embedding = self.compute_text_embedding(metadata_text)
-                    
+
                     self.database_manager.add_embedding(
                         image_id=image_id,
                         embedding=text_embedding,
                         model_type="sentence_transformer",
                         model_name="all-MiniLM-L6-v2",
                         embedding_type="text",
-                        metadata={"source_text": metadata_text}
+                        metadata={"source_text": metadata_text},
                     )
-                
-                elif embedding_type == 'image':
+
+                elif embedding_type == "image":
                     # Note: Image embedding would require loading the actual image
                     # This is a placeholder for future implementation
                     logger.warning("Image embedding computation not yet implemented")
-        
+
         return image_id
 
     def search_similar(
@@ -185,7 +179,7 @@ class DatabaseEmbeddingManager:
         model_type: str = "sentence_transformer",
         embedding_type: str = "text",
         k: int = 5,
-        similarity_threshold: float = 0.5
+        similarity_threshold: float = 0.5,
     ) -> List[Dict[str, Any]]:
         """
         Search for similar images using text query.
@@ -202,37 +196,40 @@ class DatabaseEmbeddingManager:
         """
         # Compute query embedding
         query_embedding = self.compute_text_embedding(query)
-        
+
         # Search in database
         results = self.database_manager.search_similar_embeddings(
             query_embedding=query_embedding,
             model_type=model_type,
             embedding_type=embedding_type,
             k=k,
-            similarity_threshold=similarity_threshold
+            similarity_threshold=similarity_threshold,
         )
-        
+
         # Enrich results with image metadata using direct SQL to avoid session issues
         enriched_results = []
         for result in results:
             # Get image metadata directly from database
             with self.database_manager.get_db_session_context() as session:
                 from sqlalchemy import text
+
                 image_result = session.execute(
                     text("SELECT image_path, description, tags FROM images WHERE id = :image_id"),
-                    {"image_id": result['image_id']}
+                    {"image_id": result["image_id"]},
                 ).fetchone()
-                
+
                 if image_result:
-                    enriched_results.append({
-                        'image_id': result['image_id'],
-                        'image_path': image_result.image_path,
-                        'description': image_result.description,
-                        'tags': image_result.tags,
-                        'similarity_score': result['similarity_score'],
-                        'metadata': result['metadata']
-                    })
-        
+                    enriched_results.append(
+                        {
+                            "image_id": result["image_id"],
+                            "image_path": image_result.image_path,
+                            "description": image_result.description,
+                            "tags": image_result.tags,
+                            "similarity_score": result["similarity_score"],
+                            "metadata": result["metadata"],
+                        }
+                    )
+
         return enriched_results
 
     def get_database_stats(self) -> Dict[str, Any]:
@@ -242,24 +239,19 @@ class DatabaseEmbeddingManager:
     def _format_metadata_text(self, metadata: Dict[str, Any]) -> str:
         """Format metadata into searchable text."""
         parts = []
-        
-        if metadata.get('description'):
-            parts.append(metadata['description'])
-        
-        if metadata.get('tags'):
-            parts.extend(metadata['tags'])
-        
-        if metadata.get('width') and metadata.get('height'):
+
+        if metadata.get("description"):
+            parts.append(metadata["description"])
+
+        if metadata.get("tags"):
+            parts.extend(metadata["tags"])
+
+        if metadata.get("width") and metadata.get("height"):
             parts.append(f"Size: {metadata['width']}x{metadata['height']}")
-        
+
         return " | ".join(parts) if parts else "No description available"
 
-    def migrate_from_faiss(
-        self,
-        faiss_index_path: str,
-        metadata_path: str,
-        batch_size: int = 100
-    ) -> int:
+    def migrate_from_faiss(self, faiss_index_path: str, metadata_path: str, batch_size: int = 100) -> int:
         """
         Migrate data from FAISS index to database.
 
@@ -273,29 +265,29 @@ class DatabaseEmbeddingManager:
         """
         import faiss
         import pickle
-        
+
         try:
             # Load FAISS index and metadata
             index = faiss.read_index(faiss_index_path)
-            with open(metadata_path, 'rb') as f:
+            with open(metadata_path, "rb") as f:
                 metadata_store = pickle.load(f)
-            
+
             logger.info(f"Migrating {len(metadata_store)} items from FAISS to database...")
-            
+
             migrated_count = 0
-            
+
             for i, item in enumerate(metadata_store):
                 try:
                     # Get embedding from FAISS index
                     embedding = index.reconstruct(i)
-                    
+
                     # Add image to database
                     image_id = self.add_image_with_embeddings(
-                        image_path=item['image_path'],
-                        metadata=item['metadata'],
-                        compute_embeddings=False  # We'll add the existing embedding
+                        image_path=item["image_path"],
+                        metadata=item["metadata"],
+                        compute_embeddings=False,  # We'll add the existing embedding
                     )
-                    
+
                     # Add the existing embedding
                     self.database_manager.add_embedding(
                         image_id=image_id,
@@ -303,21 +295,21 @@ class DatabaseEmbeddingManager:
                         model_type="sentence_transformer",
                         model_name="all-MiniLM-L6-v2",
                         embedding_type="text",
-                        metadata={"migrated_from_faiss": True, "original_index": i}
+                        metadata={"migrated_from_faiss": True, "original_index": i},
                     )
-                    
+
                     migrated_count += 1
-                    
+
                     if (i + 1) % batch_size == 0:
                         logger.info(f"Migrated {i + 1}/{len(metadata_store)} items")
-                
+
                 except Exception as e:
                     logger.error(f"Failed to migrate item {i}: {e}")
                     continue
-            
+
             logger.info(f"Migration completed: {migrated_count}/{len(metadata_store)} items migrated")
             return migrated_count
-            
+
         except Exception as e:
             logger.error(f"Migration failed: {e}")
-            raise 
+            raise

@@ -63,9 +63,7 @@ class ColoredFormatter(logging.Formatter):
         formatted = super().format(record)
 
         # Add color to level name
-        formatted = formatted.replace(
-            record.levelname, f"{color}{record.levelname}{reset}"
-        )
+        formatted = formatted.replace(record.levelname, f"{color}{record.levelname}{reset}")
 
         return formatted
 

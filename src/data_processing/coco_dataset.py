@@ -25,9 +25,7 @@ class COCODataset(ImageMetadataDataset):
         """
         self.coco_dir = coco_dir
         self.split = split
-        self.processor = processor or self._load_clip_processor(
-            "openai/clip-vit-base-patch32"
-        )
+        self.processor = processor or self._load_clip_processor("openai/clip-vit-base-patch32")
 
         # Load processed annotations
         with open(os.path.join(coco_dir, "processed_annotations.json"), "r") as f:
@@ -35,9 +33,7 @@ class COCODataset(ImageMetadataDataset):
 
         # Filter for the specified split
         self.annotations = [
-            ann
-            for ann in self.annotations
-            if ann["image_path"].startswith(os.path.join(coco_dir, split))
+            ann for ann in self.annotations if ann["image_path"].startswith(os.path.join(coco_dir, split))
         ]
 
         if max_images:
@@ -74,9 +70,7 @@ class COCODataset(ImageMetadataDataset):
 
         # Load and process image
         image = Image.open(ann["image_path"]).convert("RGB")
-        processed_image = self.processor(images=image, return_tensors="pt")[
-            "pixel_values"
-        ][0]
+        processed_image = self.processor(images=image, return_tensors="pt")["pixel_values"][0]
 
         # Create metadata dictionary
         metadata = {

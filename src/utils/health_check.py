@@ -73,9 +73,7 @@ class HealthChecker:
         self.checks[name] = check_func
         logger.info(f"Registered health check: {name}")
 
-    def run_health_check(
-        self, check_name: Optional[str] = None
-    ) -> Dict[str, HealthCheckResult]:
+    def run_health_check(self, check_name: Optional[str] = None) -> Dict[str, HealthCheckResult]:
         """Run health checks."""
         start_time = time.time()
         results = {}
@@ -189,9 +187,7 @@ class HealthChecker:
             for i in range(gpu_count):
                 memory_allocated = torch.cuda.memory_allocated(i) / 1024 / 1024  # MB
                 memory_reserved = torch.cuda.memory_reserved(i) / 1024 / 1024  # MB
-                memory_total = (
-                    torch.cuda.get_device_properties(i).total_memory / 1024 / 1024
-                )  # MB
+                memory_total = torch.cuda.get_device_properties(i).total_memory / 1024 / 1024  # MB
                 memory_usage_percent = (memory_reserved / memory_total) * 100
 
                 gpu_details[f"gpu_{i}"] = {
@@ -341,12 +337,8 @@ class HealthChecker:
             details = {
                 "torch_version": torch.__version__,
                 "cuda_available": torch.cuda.is_available(),
-                "cuda_version": (
-                    torch.version.cuda if torch.cuda.is_available() else None
-                ),
-                "device_count": (
-                    torch.cuda.device_count() if torch.cuda.is_available() else 0
-                ),
+                "cuda_version": (torch.version.cuda if torch.cuda.is_available() else None),
+                "device_count": (torch.cuda.device_count() if torch.cuda.is_available() else 0),
             }
 
             if torch.cuda.is_available():
@@ -385,18 +377,10 @@ class HealthChecker:
             "overall_status": overall_status.value,
             "timestamp": time.time(),
             "total_checks": len(self.results),
-            "healthy_checks": len(
-                [r for r in self.results.values() if r.status == HealthStatus.HEALTHY]
-            ),
-            "warning_checks": len(
-                [r for r in self.results.values() if r.status == HealthStatus.WARNING]
-            ),
-            "critical_checks": len(
-                [r for r in self.results.values() if r.status == HealthStatus.CRITICAL]
-            ),
-            "unknown_checks": len(
-                [r for r in self.results.values() if r.status == HealthStatus.UNKNOWN]
-            ),
+            "healthy_checks": len([r for r in self.results.values() if r.status == HealthStatus.HEALTHY]),
+            "warning_checks": len([r for r in self.results.values() if r.status == HealthStatus.WARNING]),
+            "critical_checks": len([r for r in self.results.values() if r.status == HealthStatus.CRITICAL]),
+            "unknown_checks": len([r for r in self.results.values() if r.status == HealthStatus.UNKNOWN]),
             "results": {
                 name: {
                     "status": result.status.value,
