@@ -195,9 +195,7 @@ class TestModelCache(unittest.TestCase):
 
     def test_cache_warmup(self):
         """Test cache warmup functionality."""
-        warmup_configs = [
-            {"model_type": "test", "model_name": "warmup-model", "device": "cpu"}
-        ]
+        warmup_configs = [{"model_type": "test", "model_name": "warmup-model", "device": "cpu"}]
 
         # Run warmup
         self.cache.warmup_cache(warmup_configs)
