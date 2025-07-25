@@ -4,11 +4,6 @@
 
 A comprehensive Retrieval-Augmented Generation (RAG) system for image generation using the COCO dataset, featuring PostgreSQL database integration with pgvector for efficient vector similarity search.
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
-[![pgvector](https://img.shields.io/badge/pgvector-✓-green.svg)](https://github.com/pgvector/pgvector)
-
 ## Features
 
 - **Vector Similarity Search**: Fast image retrieval using pgvector
@@ -136,7 +131,7 @@ generated_image = generator.generate(augmented_prompt)
 ### Setup Development Environment
 ```bash
 # Install development dependencies
-pip install -r requirements-dev.txt
+uv pip install -e ".[dev]"
 
 # Run tests
 pytest tests/
