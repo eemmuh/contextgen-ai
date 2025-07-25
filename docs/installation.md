@@ -134,7 +134,7 @@ For development work:
 
 ```bash
 # Install development dependencies
-pip install -r requirements-dev.txt
+uv pip install -e ".[dev]"
 
 # Install pre-commit hooks
 pre-commit install
