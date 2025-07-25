@@ -8,68 +8,27 @@ This script demonstrates how to:
 3. Generate images from text prompts
 """
 
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from src.embedding.embedding_manager import EmbeddingManager
-from src.retrieval.rag_manager import RAGManager
+from src.embedding.database_embedding_manager import DatabaseEmbeddingManager
 from src.generation.image_generator import ImageGenerator
-from src.data_processing.coco_dataset import COCODataset
 
 
 def main():
-    print("🎨 RAG-based Image Generation - Basic Usage Example")
-    print("=" * 50)
-
-    # 1. Initialize components
-    print("1. Initializing components...")
-    embedding_manager = EmbeddingManager()
-    rag_manager = RAGManager(embedding_manager)
+    # Initialize managers
+    db_manager = DatabaseEmbeddingManager()
     image_generator = ImageGenerator()
 
-    # 2. Load pre-processed embeddings (assuming they exist)
-    try:
-        print("2. Loading existing embeddings...")
-        embedding_manager.load_index("embeddings/coco_dataset")
-        print("   ✅ Embeddings loaded successfully!")
-    except FileNotFoundError:
-        print("   ❌ No embeddings found. Please run dataset processing first:")
-        print("   python -m src.main --process-dataset --dataset-type coco")
-        return
+    # Example: Search for similar images
+    query = "a cat playing"
+    results = db_manager.search_similar(query, k=5)
 
-    # 3. Generate images from prompts
-    test_prompts = [
-        "a cat sitting on a chair",
-        "a dog playing in a park",
-        "a sunset over mountains",
-        "a flower in a vase",
-    ]
+    for result in results:
+        print(f"Image: {result['image_path']}")
+        print(f"Similarity: {result['similarity_score']:.3f}")
 
-    print("3. Generating images from prompts...")
-    for i, prompt in enumerate(test_prompts):
-        print(f"\n   Processing: '{prompt}'")
-
-        # Process query through RAG
-        rag_output = rag_manager.process_query(prompt)
-
-        print(f"   Original prompt: {rag_output['original_query']}")
-        print(f"   Enhanced prompt: {rag_output['augmented_prompt']}")
-        print(f"   Found {len(rag_output['similar_examples'])} similar examples")
-
-        # Generate image
-        result = image_generator.generate_from_rag_output(
-            rag_output=rag_output,
-            output_dir="examples/output",
-            num_images=1,
-            seed=42 + i,  # For reproducibility
-        )
-
-        print(f"   ✅ Generated: {result['generated_images'][0]}")
-
-    print(f"\n🎉 Generated {len(test_prompts)} images!")
-    print("📁 Check the 'examples/output/' directory for results.")
+    # Example: Generate an image
+    prompt = "a cat playing with a ball"
+    generated_image = image_generator.generate(prompt)
+    print(f"Generated image: {generated_image}")
 
 
 if __name__ == "__main__":
