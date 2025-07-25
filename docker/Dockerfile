@@ -22,10 +22,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt requirements-dev.txt requirements-test.txt ./
-RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir -r requirements-dev.txt \
-    && pip install --no-cache-dir -r requirements-test.txt
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir -e ".[dev]"
 
 # Copy project
 COPY . .
