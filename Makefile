@@ -5,7 +5,7 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-15s %s\n", $$1, $$2}'
 
 install: ## Install dependencies
-	pip install -r requirements.txt
+	uv pip install -r requirements.txt
 
 setup: install ## Set up the project (install deps + create .env)
 	@if [ ! -f .env ]; then \
@@ -122,7 +122,7 @@ docker-reset: ## Reset PostgreSQL database (removes all data)
 
 # Development and code quality commands
 dev-install: ## Install development dependencies
-	pip install -r requirements-dev.txt
+	uv pip install -r requirements-dev.txt
 
 type-check: ## Run type checking with mypy
 	mypy src/ --ignore-missing-imports
@@ -206,3 +206,7 @@ dev-setup-complete: dev-install pre-commit-install ## Complete development envir
 	@echo "5. Run 'make format' to format code"
 	@echo "6. Run 'make api-dev' to start API server"
 	@echo "7. Run 'make api-docs' to view API documentation" 
+
+
+
+	
