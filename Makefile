@@ -5,7 +5,7 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-15s %s\n", $$1, $$2}'
 
 install: ## Install dependencies
-	uv pip install -r requirements.txt
+	uv pip install -e .
 
 setup: install ## Set up the project (install deps + create .env)
 	@if [ ! -f .env ]; then \
@@ -122,7 +122,7 @@ docker-reset: ## Reset PostgreSQL database (removes all data)
 
 # Development and code quality commands
 dev-install: ## Install development dependencies
-	uv pip install -r requirements-dev.txt
+	uv pip install -e ".[dev]"
 
 type-check: ## Run type checking with mypy
 	mypy src/ --ignore-missing-imports
