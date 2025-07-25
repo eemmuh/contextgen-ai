@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "image-model-coco"
@@ -30,7 +30,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "torch>=2.0.0",
     "transformers>=4.30.0",
@@ -72,8 +72,8 @@ dev = [
     "pytest-docker>=2.0.0",
 ]
 gpu = [
-    "torch>=2.0.0+cu118",
-    "torchvision>=0.15.0+cu118",
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
 ]
 docs = [
     "sphinx>=6.0.0",
@@ -91,12 +91,11 @@ Repository = "https://github.com/yourusername/image-model-coco-model.git"
 [project.scripts]
 image-model-coco = "src.main:main"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["src*"]
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
-[tool.setuptools.package-data]
-"*" = ["*.md", "*.txt", "*.yml", "*.yaml"]
+[tool.hatch.build.targets.wheel.sources]
+"src" = "src"
 
 [tool.black]
 line-length = 120
