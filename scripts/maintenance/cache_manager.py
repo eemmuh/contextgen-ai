@@ -31,12 +31,8 @@ def print_cache_info():
 
     print("📊 Cache Information")
     print("=" * 50)
-    print(
-        f"Memory Cache: {info['memory_cache_size']} models ({info['memory_cache_size_mb']:.1f} MB)"
-    )
-    print(
-        f"Disk Cache: {info['disk_cache_size']} models ({info['disk_cache_size_mb']:.1f} MB)"
-    )
+    print(f"Memory Cache: {info['memory_cache_size']} models ({info['memory_cache_size_mb']:.1f} MB)")
+    print(f"Disk Cache: {info['disk_cache_size']} models ({info['disk_cache_size_mb']:.1f} MB)")
     print(f"Total Size: {info['total_size_mb']:.1f} MB")
     print(f"Hit Rate: {info['hit_rate_percent']:.1f}%")
     print(f"Total Requests: {info['total_requests']}")
@@ -192,9 +188,7 @@ def main():
         help="Command to execute",
     )
 
-    parser.add_argument(
-        "--model-type", "-t", help="Model type to clear (for clear command)"
-    )
+    parser.add_argument("--model-type", "-t", help="Model type to clear (for clear command)")
     parser.add_argument(
         "--duration",
         "-d",

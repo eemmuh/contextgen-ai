@@ -44,12 +44,8 @@ def print_system_overview():
     # System metrics
     system_metrics = get_system_metrics()
     print(f"📊 System Metrics:")
-    print(
-        f"   Memory: {system_metrics['memory']['rss_mb']:.1f} MB ({system_metrics['memory']['percent']:.1f}%)"
-    )
-    print(
-        f"   CPU: {system_metrics['cpu']['percent']:.1f}% ({system_metrics['cpu']['count']} cores)"
-    )
+    print(f"   Memory: {system_metrics['memory']['rss_mb']:.1f} MB ({system_metrics['memory']['percent']:.1f}%)")
+    print(f"   CPU: {system_metrics['cpu']['percent']:.1f}% ({system_metrics['cpu']['count']} cores)")
     print(f"   Disk: {system_metrics['disk']['usage_percent']:.1f}% used")
 
     if system_metrics["gpu"]:
@@ -61,12 +57,8 @@ def print_system_overview():
     cache = get_model_cache()
     cache_info = cache.get_cache_info()
     print(f"\n💾 Cache Information:")
-    print(
-        f"   Memory Cache: {cache_info['memory_cache_size']} models ({cache_info['memory_cache_size_mb']:.1f} MB)"
-    )
-    print(
-        f"   Disk Cache: {cache_info['disk_cache_size']} models ({cache_info['disk_cache_size_mb']:.1f} MB)"
-    )
+    print(f"   Memory Cache: {cache_info['memory_cache_size']} models ({cache_info['memory_cache_size_mb']:.1f} MB)")
+    print(f"   Disk Cache: {cache_info['disk_cache_size']} models ({cache_info['disk_cache_size_mb']:.1f} MB)")
     print(f"   Hit Rate: {cache_info['hit_rate_percent']:.1f}%")
     print(f"   Total Requests: {cache_info['total_requests']}")
 
@@ -169,9 +161,7 @@ def print_cache_details():
     print(f"\nCache Limits:")
     print(f"   Memory Limit: {cache_info['max_memory_size_mb']:.1f} MB")
     print(f"   Disk Limit: {cache_info['max_disk_size_mb']:.1f} MB")
-    print(
-        f"   Compression: {'Enabled' if cache_info['compression_enabled'] else 'Disabled'}"
-    )
+    print(f"   Compression: {'Enabled' if cache_info['compression_enabled'] else 'Disabled'}")
 
     if cache_info["cached_models"]:
         print(f"\nCached Models:")
