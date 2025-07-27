@@ -20,7 +20,7 @@ class Image(Base):
     tags = Column(JSON, default=list)
     width = Column(Integer, nullable=True)
     height = Column(Integer, nullable=True)
-    metadata = Column(JSON, default=dict)
+    image_metadata = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

@@ -8,7 +8,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from .models import Base, Image, Generation, SystemMetrics
-from .session import get_session
+from .session import get_db_session
 
 logger = logging.getLogger(__name__)
 

@@ -110,7 +110,10 @@ class HealthCheck(BaseModel):
     version: str = Field(..., description="API version")
     uptime_seconds: float = Field(..., description="Service uptime in seconds")
     database_connected: bool = Field(..., description="Database connection status")
-    model_cache_healthy: bool = Field(..., description="Model cache health status")
+    cache_healthy: bool = Field(..., description="Model cache health status")
+    
+    class Config:
+        protected_namespaces = ()
 
 
 class ErrorResponse(BaseModel):

@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from src.api.routes import router
 from src.utils.logger import get_logger
 from src.utils.error_handler import get_error_handler
+from src.core.exceptions import BaseAppException
 
 logger = get_logger(__name__)
 error_handler = get_error_handler()
@@ -51,6 +52,16 @@ def create_app() -> FastAPI:
             status_code=500,
             content={"detail": "Internal server error"},
         )
+    
+    # Add custom exception handler
+    @app.exception_handler(BaseAppException)
+    async def app_exception_handler(request: Request, exc: BaseAppException):
+        """Handle custom application exceptions."""
+        logger.error(f"Application exception: {exc}")
+        return JSONResponse(
+            status_code=exc.status_code,
+            content=exc.to_dict()
+        )
 
     # Include routers
     app.include_router(router, prefix="/api/v1")
@@ -61,15 +72,15 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-    @app.get("/")
-    async def root():
-        """Root endpoint."""
+@app.get("/")
+async def root():
+    """Root endpoint."""
     return {"message": "RAG-based Image Generation API"}
 
 
-    @app.get("/health")
-    async def health_check():
-        """Health check endpoint."""
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
     return {"status": "healthy"}
 
 

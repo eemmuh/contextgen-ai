@@ -74,7 +74,7 @@ async def health_check(
             version=settings.api.version,
             uptime_seconds=uptime,
             database_connected=db_connected,
-            model_cache_healthy=cache_healthy
+            cache_healthy=cache_healthy
         )
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -84,7 +84,7 @@ async def health_check(
             version=settings.api.version,
             uptime_seconds=time.time() - start_time,
             database_connected=False,
-            model_cache_healthy=False
+            cache_healthy=False
         )
 
 
@@ -516,12 +516,4 @@ async def search_with_rag(
         raise HTTPException(status_code=500, detail="RAG search failed")
 
 
-# Global exception handler for custom exceptions
-@router.exception_handler(BaseAppException)
-async def app_exception_handler(request: Request, exc: BaseAppException):
-    """Handle custom application exceptions."""
-    logger.error(f"Application exception: {exc}")
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=exc.to_dict()
-    )
+# Note: Exception handlers should be registered on the main app, not the router
