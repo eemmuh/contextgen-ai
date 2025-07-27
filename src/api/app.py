@@ -61,15 +61,15 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-@app.get("/")
-async def root():
-    """Root endpoint."""
+    @app.get("/")
+    async def root():
+        """Root endpoint."""
     return {"message": "RAG-based Image Generation API"}
 
 
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
+    @app.get("/health")
+    async def health_check():
+        """Health check endpoint."""
     return {"status": "healthy"}
 
 
