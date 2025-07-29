@@ -6,9 +6,10 @@ error handling, and performance optimizations.
 """
 
 import time
+import os
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, UploadFile, File, Depends, Query, Path
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends, Query, Path, BackgroundTasks
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.requests import Request
 
 from src.api.schemas import (
@@ -167,18 +168,32 @@ async def generate_image(
                 "Width and height must be divisible by 8"
             )
         
-        # Generate images
+        # Generate images asynchronously
         generation_id = f"gen_{int(time.time())}_{hash(request.prompt) % 10000}"
         
-        # For now, we'll simulate the generation process
-        # In a real implementation, this would be async and potentially queued
-        generated_images = image_generator.generate(
-            prompt=request.prompt,
-            num_images=request.num_images
-        )
-        
-        # Convert to response format
-        image_urls = [f"/api/v1/images/{generation_id}/{i}" for i in range(len(generated_images))]
+        # Generate images using the actual image generator
+        try:
+            generated_images = await image_generator.generate_async(
+                prompt=request.prompt,
+                num_images=request.num_images,
+                width=request.width,
+                height=request.height
+            )
+            
+            # Save generated images and create URLs
+            image_urls = []
+            for i, image in enumerate(generated_images):
+                # Save image to disk
+                image_path = f"output/generated/{generation_id}_{i}.{request.format.value.lower()}"
+                os.makedirs(os.path.dirname(image_path), exist_ok=True)
+                image.save(image_path)
+                
+                # Create URL for the saved image
+                image_urls.append(f"/api/v1/images/{generation_id}/{i}")
+                
+        except Exception as e:
+            logger.error(f"Image generation failed: {e}")
+            raise ImageGenerationError(f"Failed to generate images: {str(e)}")
         
         generation_result = GenerationResult(
             id=generation_id,
