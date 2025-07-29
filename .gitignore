@@ -190,6 +190,14 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
+# Alembic - ignore generated files but keep migrations
+# alembic.ini should be committed
+# src/database/migrations/ should be committed
+# src/database/migrations/versions/ should be committed
+# Ignore any temporary Alembic files
+alembic.ini.bak
+*.pyc in migrations/
+
 # API keys and secrets
 .env.local
 .env.production
