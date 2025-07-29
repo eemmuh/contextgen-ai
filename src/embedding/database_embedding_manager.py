@@ -167,9 +167,41 @@ class DatabaseEmbeddingManager:
                     )
 
                 elif embedding_type == "image":
-                    # Note: Image embedding would require loading the actual image
-                    # This is a placeholder for future implementation
-                    logger.warning("Image embedding computation not yet implemented")
+                    # Load and process the actual image
+                    try:
+                        from PIL import Image
+                        import torchvision.transforms as transforms
+                        
+                        # Load image
+                        image = Image.open(image_path).convert('RGB')
+                        
+                        # Preprocess for CLIP model
+                        transform = transforms.Compose([
+                            transforms.Resize((224, 224)),
+                            transforms.ToTensor(),
+                            transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+                                               std=[0.229, 0.224, 0.225])
+                        ])
+                        
+                        image_tensor = transform(image).unsqueeze(0).to(self.device)
+                        
+                        # Compute image embedding
+                        image_embedding = self.compute_image_embedding(image_tensor)
+                        
+                        self.database_manager.add_embedding(
+                            image_id=image_id,
+                            embedding=image_embedding,
+                            model_type="clip",
+                            model_name=self.image_model_name,
+                            embedding_type="image",
+                            metadata={"image_path": image_path, "image_size": image.size},
+                        )
+                        
+                        logger.info(f"Computed image embedding for {image_path}")
+                        
+                    except Exception as e:
+                        logger.error(f"Failed to compute image embedding for {image_path}: {e}")
+                        # Continue with other embedding types even if image embedding fails
 
         return image_id
 
