@@ -3,6 +3,7 @@ from diffusers import StableDiffusionPipeline
 from typing import Dict, Optional, List
 import os
 from PIL import Image
+import asyncio
 from src.utils.model_cache import get_model_cache
 
 
@@ -111,6 +112,53 @@ class ImageGenerator:
             generator=generator,
         ).images
 
+        return images
+
+    async def generate_async(
+        self,
+        prompt: str,
+        num_images: int = 1,
+        width: int = 512,
+        height: int = 512,
+        negative_prompt: Optional[str] = None,
+        seed: Optional[int] = None,
+        fast_mode: bool = False,
+    ) -> List[Image.Image]:
+        """
+        Generate images asynchronously.
+
+        Args:
+            prompt: Text prompt for image generation
+            num_images: Number of images to generate
+            width: Image width
+            height: Image height
+            negative_prompt: Negative prompt to guide generation away from certain elements
+            seed: Random seed for reproducibility
+            fast_mode: Use faster generation settings
+
+        Returns:
+            List of generated PIL Images
+        """
+        # Run the synchronous generation in a thread pool to avoid blocking
+        loop = asyncio.get_event_loop()
+        images = await loop.run_in_executor(
+            None,
+            self.generate_image,
+            prompt,
+            negative_prompt,
+            num_images,
+            seed,
+            fast_mode
+        )
+        
+        # Resize images to requested dimensions if needed
+        if width != 512 or height != 512:
+            resized_images = []
+            for image in images:
+                resized_image = image.resize((width, height), Image.Resampling.LANCZOS)
+                resized_images.append(resized_image)
+            return resized_images
+        
         return images
 
     def save_images(self, images: List[Image.Image], output_dir: str, prefix: str = "generated") -> List[str]:
