@@ -207,6 +207,117 @@ dev-setup-complete: dev-install pre-commit-install ## Complete development envir
 	@echo "6. Run 'make api-dev' to start API server"
 	@echo "7. Run 'make api-docs' to view API documentation" 
 
+# Database management
+setup-db: docker-up
+	@echo "Setting up database..."
+	python scripts/setup_database.py
+
+migrate-db:
+	@echo "Running database migrations..."
+	alembic upgrade head
+
+migrate-create:
+	@echo "Creating new migration..."
+	alembic revision --autogenerate -m "$(message)"
+
+migrate-downgrade:
+	@echo "Downgrading database..."
+	alembic downgrade -1
+
+# Dependency management
+install-deps:
+	@echo "Installing dependencies..."
+	uv pip install -e ".[dev]"
+
+update-deps:
+	@echo "Updating dependencies..."
+	uv pip install --upgrade -e ".[dev]"
+
+# Development tools
+format:
+	@echo "Formatting code..."
+	black src/ tests/ config/ scripts/
+	isort src/ tests/ config/ scripts/
+
+lint:
+	@echo "Running linters..."
+	flake8 src/ tests/ config/ scripts/
+	mypy src/ config/
+
+type-check:
+	@echo "Running type checker..."
+	mypy src/ config/
+
+security-check:
+	@echo "Running security checks..."
+	bandit -r src/ -f json -o reports/security_report.json
+
+# Testing
+test:
+	@echo "Running tests..."
+	pytest tests/ -v
+
+test-coverage:
+	@echo "Running tests with coverage..."
+	pytest tests/ --cov=src --cov-report=html --cov-report=term
+
+test-unit:
+	@echo "Running unit tests..."
+	pytest tests/unit/ -v
+
+test-integration:
+	@echo "Running integration tests..."
+	pytest tests/integration/ -v
+
+# Performance and monitoring
+profile:
+	@echo "Running performance profiling..."
+	python -m cProfile -o reports/profile.prof src/main.py
+
+analyze-profile:
+	@echo "Analyzing profile results..."
+	python -c "import pstats; p = pstats.Stats('reports/profile.prof'); p.sort_stats('cumulative').print_stats(20)"
+
+# Documentation
+docs:
+	@echo "Building documentation..."
+	cd docs && make html
+
+docs-serve:
+	@echo "Serving documentation..."
+	cd docs/_build/html && python -m http.server 8001
+
+# Cleanup
+clean:
+	@echo "Cleaning up..."
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
+	rm -rf build/ dist/ .pytest_cache/ .coverage htmlcov/
+
+clean-models:
+	@echo "Cleaning model cache..."
+	rm -rf .model_cache/
+
+clean-output:
+	@echo "Cleaning output files..."
+	rm -rf output/generated/
+	rm -rf logs/*.log
+
+# Full setup
+setup: install-deps setup-db
+	@echo "Setup complete!"
+
+# Development workflow
+dev: format lint test
+	@echo "Development checks complete!"
+
+# Production deployment
+deploy: clean install-deps migrate-db
+	@echo "Deployment ready!"
+
+.PHONY: help docker-up docker-down docker-restart docker-logs docker-status setup-db verify-db test-db list-datasets migrate-faiss migrate-faiss-real install-deps update-deps format lint type-check security-check test test-coverage test-unit test-integration profile analyze-profile docs docs-serve clean clean-models clean-output setup dev deploy migrate-db migrate-create migrate-downgrade 
+
 
 
 	
