@@ -102,13 +102,14 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
+.venv/
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
 .uv/
+.ruff_cache/
 
 # Spyder project settings
 .spyderproject
@@ -196,7 +197,7 @@ Thumbs.db
 # src/database/migrations/versions/ should be committed
 # Ignore any temporary Alembic files
 alembic.ini.bak
-*.pyc in migrations/
+# (bytecode is already covered by `*.py[cod]`)
 
 # API keys and secrets
 .env.local
@@ -217,23 +218,8 @@ config/secrets.py
 *.pt
 *.pth
 
-# Generated images and media
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.bmp
-*.tiff
-*.webp
-*.mp4
-*.avi
-*.mov
-*.wmv
-
-# Keep example outputs and test fixtures
-!examples/output/*.png
-!docs/images/*.png
-!tests/fixtures/*.png
+# Generated media is ignored via directories (e.g. `output/`, `uploads/`, `data/`).
+# Avoid ignoring image/video extensions globally so small assets can be committed when needed.
 
 # Performance profiling
 *.prof

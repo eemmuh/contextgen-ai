@@ -8,7 +8,7 @@ secure handling of sensitive information.
 
 import os
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from pydantic import Field, validator
 from pydantic.types import SecretStr
 from pydantic_settings import BaseSettings
@@ -128,6 +128,20 @@ class Settings(BaseSettings):
     database: DatabaseSettings = Field(default_factory=DatabaseSettings)
     model: ModelSettings = Field(default_factory=ModelSettings)
     api: APISettings = Field(default_factory=APISettings)
+    
+    # CORS settings
+    cors_origins: List[str] = Field(
+        default=["*"],
+        description="CORS allowed origins"
+    )
+    
+    # Rate limiting settings
+    rate_limit_requests_per_minute: int = Field(
+        default=60,
+        description="Rate limit requests per minute per client"
+    )
+    
+    # Logging settings
     logging: LoggingSettings = Field(default_factory=LoggingSettings)
     security: SecuritySettings = Field(default_factory=SecuritySettings)
     cache: CacheSettings = Field(default_factory=CacheSettings)

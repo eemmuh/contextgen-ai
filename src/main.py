@@ -7,7 +7,10 @@ from src.embedding.embedding_manager import EmbeddingManager
 from src.retrieval.rag_manager import RAGManager
 from src.generation.image_generator import ImageGenerator
 from src.utils.model_cache import get_model_cache
+from src.utils.logger import get_logger
 from typing import Optional
+
+logger = get_logger("main")
 
 
 def setup_environment():
@@ -28,7 +31,7 @@ def process_dataset(
     max_images: Optional[int] = None,
 ):
     """Process the dataset and create embeddings."""
-    print(f"Processing {dataset_type} dataset...")
+    logger.info(f"Processing {dataset_type} dataset...")
 
     # Initialize dataset
     if dataset_type == "coco":
@@ -41,11 +44,11 @@ def process_dataset(
         embedding_manager = EmbeddingManager()
 
     # Process each item in the dataset
-    print(f"📊 Processing {len(dataset)} images...")
+    logger.info(f"📊 Processing {len(dataset)} images...")
 
     for i in range(len(dataset)):
         if i % 20 == 0:  # Progress indicator
-            print(f"   Processing image {i+1}/{len(dataset)}")
+            logger.info(f"   Processing image {i+1}/{len(dataset)}")
 
         item = dataset[i]
 
@@ -62,7 +65,7 @@ def process_dataset(
 
     # Save the index
     embedding_manager.save_index(f"embeddings/{dataset_type}_dataset")
-    print("Dataset processing complete!")
+    logger.info("Dataset processing complete!")
 
 
 def main():
@@ -103,14 +106,14 @@ def main():
     if args.cache_info:
         model_cache = get_model_cache()
         cache_info = model_cache.get_cache_info()
-        print("📊 Model Cache Information:")
-        print(f"   Memory cache size: {cache_info['memory_cache_size']} models")
-        print(f"   Disk cache size: {cache_info['disk_cache_size']} models")
-        print(f"   Total cache size: {cache_info['total_size_bytes'] / (1024*1024):.2f} MB")
-        print("   Cached models:")
+        logger.info("📊 Model Cache Information:")
+        logger.info(f"   Memory cache size: {cache_info['memory_cache_size']} models")
+        logger.info(f"   Disk cache size: {cache_info['disk_cache_size']} models")
+        logger.info(f"   Total cache size: {cache_info['total_size_bytes'] / (1024*1024):.2f} MB")
+        logger.info("   Cached models:")
         for model_type, model_names in cache_info["cached_models"].items():
             model_names_str = ", ".join(model_names)
-            print("     - {}: {}".format(model_type, model_names_str))
+            logger.info("     - {}: {}".format(model_type, model_names_str))
         return
 
     if args.clear_cache:
@@ -145,14 +148,14 @@ def main():
         for path in possible_paths:
             try:
                 embedding_manager.load_index(path)
-                print(f"✅ Loaded embeddings from: {path}")
+                logger.info(f"✅ Loaded embeddings from: {path}")
                 embedding_loaded = True
                 break
             except (FileNotFoundError, RuntimeError):
                 continue
 
         if not embedding_loaded:
-            print(f"❌ No existing embeddings found. Please run with --process-dataset first.")
+            logger.warning(f"❌ No existing embeddings found. Please run with --process-dataset first.")
             return
 
     # Initialize RAG and image generation components
@@ -161,18 +164,18 @@ def main():
 
     # Process the query if provided
     if args.prompt:
-        print(f"Processing query: {args.prompt}")
+        logger.info(f"Processing query: {args.prompt}")
         rag_output = rag_manager.process_query(args.prompt)
 
-        print(f"Augmented prompt: {rag_output['augmented_prompt']}")
-        print("\nRetrieved similar examples:")
+        logger.info(f"Augmented prompt: {rag_output['augmented_prompt']}")
+        logger.info("\nRetrieved similar examples:")
         for example in rag_output["similar_examples"]:
-            print(f"- {example['metadata'].get('description', 'No description')}")
-            print(f"  Tags: {', '.join(example['metadata'].get('tags', []))}")
-            print()
+            logger.info(f"- {example['metadata'].get('description', 'No description')}")
+            logger.info(f"  Tags: {', '.join(example['metadata'].get('tags', []))}")
+            logger.info("")
 
         # Generate images
-        print("Generating images...")
+        logger.info("Generating images...")
         result = image_generator.generate_from_rag_output(
             rag_output=rag_output,
             output_dir="output",
@@ -181,9 +184,9 @@ def main():
             fast_mode=args.fast_mode,
         )
 
-        print("\nGenerated images saved to:")
+        logger.info("\nGenerated images saved to:")
         for path in result["generated_images"]:
-            print(f"- {path}")
+            logger.info(f"- {path}")
 
 
 if __name__ == "__main__":

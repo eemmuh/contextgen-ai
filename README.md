@@ -18,11 +18,13 @@ A comprehensive Retrieval-Augmented Generation (RAG) system for image generation
 
 ```bash
 # Clone and setup
-git clone https://github.com/yourusername/image-model-coco-model.git
-cd image-model-coco-model
+git clone https://github.com/eemmuh/contextgen-ai.git
+cd contextgen-ai
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -e .
+# or (without uv):
+# pip install -e .
 
 # Start database
 make docker-up
@@ -76,27 +78,14 @@ python examples/database_usage.py
 
 ## Performance
 
-- **Vector Search**: < 100ms for 1M+ embeddings
-- **Image Processing**: Batch processing with configurable sizes
-- **Database**: Connection pooling and optimized queries
-- **Caching**: Intelligent model and result caching
+- Batch-oriented dataset processing and embedding generation
+- Connection pooling for database access
+- Model and result caching
 
 ## Configuration
 
-```python
-# config/config.py
-DATABASE_CONFIG = {
-    "url": "postgresql://postgres:password@localhost:5433/image_rag_db",
-    "pool_size": 10,
-    "max_overflow": 20
-}
-
-MODEL_CONFIG = {
-    "text_model": "all-MiniLM-L6-v2",
-    "image_model": "openai/clip-vit-base-patch32",
-    "cache_dir": ".model_cache"
-}
-```
+- App and model settings live in `config/settings.py` and `config/config.py`.
+- Copy `env.example` to `.env` and adjust values as needed.
 
 ## Usage Examples
 
@@ -145,7 +134,7 @@ make format
 
 ### Project Structure
 ```
-image-model-coco-model/
+contextgen-ai/
 ├── src/                    # Core application code
 │   ├── database/          # PostgreSQL integration
 │   ├── embedding/         # Embedding management

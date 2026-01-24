@@ -1,13 +1,14 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database with pgvector
   postgres:
-    image: pgvector/pgvector:pg15
+    image: pgvector/pgvector:pg16
     container_name: image_rag_postgres
     environment:
       POSTGRES_DB: image_rag_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
     ports:
       - "5433:5432"
     volumes:
@@ -20,12 +21,57 @@ services:
       timeout: 5s
       retries: 5
 
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: image_rag_redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Main Application (optional - can run locally)
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: image_rag_app
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/image_rag_db
+      - REDIS_URL=redis://redis:6379/0
+      - MODEL_DEVICE=${MODEL_DEVICE:-cpu}
+      - CACHE_ENABLED=${CACHE_ENABLED:-true}
+    volumes:
+      - model_cache:/app/.model_cache
+      - output_data:/app/output
+      - logs_data:/app/logs
+      - ../data:/app/data:ro  # Mount data directory for development
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - app  # Only start when explicitly requested
+
+  # PgAdmin (optional - for database management)
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: image_rag_pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     ports:
       - "8080:80"
     volumes:
@@ -33,7 +79,13 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
+    profiles:
+      - tools  # Only start when explicitly requested
 
 volumes:
   postgres_data:
+  redis_data:
+  model_cache:
+  output_data:
+  logs_data:
   pgadmin_data: 

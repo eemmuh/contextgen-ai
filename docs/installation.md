@@ -3,7 +3,7 @@
 ## 📋 Prerequisites
 
 ### System Requirements
-- **Python**: 3.8 or higher
+- **Python**: 3.9 or higher
 - **Memory**: Minimum 8GB RAM (16GB+ recommended)
 - **Storage**: At least 10GB free space
 - **Docker**: For database setup (optional)
@@ -19,8 +19,8 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/image-model-coco-model.git
-cd image-model-coco-model
+git clone https://github.com/eemmuh/contextgen-ai.git
+cd contextgen-ai
 ```
 
 ### 2. Create Virtual Environment
@@ -42,8 +42,10 @@ venv\Scripts\activate
 # Upgrade pip
 pip install --upgrade pip
 
-# Install requirements
-pip install -r requirements.txt
+# Install project dependencies
+uv pip install -e .
+# or (without uv):
+# pip install -e .
 ```
 
 ### 4. Setup Database (Optional but Recommended)
@@ -56,7 +58,7 @@ make docker-up
 make setup-db
 
 # Verify connection
-make test-db
+make verify-db
 ```
 
 ### 5. Download Models (First Run)
@@ -86,9 +88,9 @@ BATCH_SIZE=32
 
 ### Configuration Files
 
-- `config/config.py`: Main configuration settings
-- `config/database.py`: Database-specific settings
-- `config/models.py`: Model configuration
+- `config/settings.py`: Application settings (env-driven, used by the API)
+- `config/config.py`: Model/dataset/database defaults used by scripts
+- `config/environments/`: Environment-specific settings
 
 ## 🧪 Verify Installation
 
@@ -113,7 +115,7 @@ python examples/database_usage.py
 pytest tests/
 
 # Run specific test
-pytest tests/test_database.py
+pytest tests/integration/test_database_integration.py
 ```
 
 ## 🐳 Docker Installation (Alternative)
@@ -184,18 +186,16 @@ lsof -i :5433
 
 ### Getting Help
 
-- Check the [Troubleshooting Guide](troubleshooting.md)
-- Review [GitHub Issues](https://github.com/yourusername/image-model-coco-model/issues)
-- Join our [Discord Community](https://discord.gg/your-community)
+- Review open issues: [GitHub Issues](https://github.com/eemmuh/contextgen-ai/issues)
 
 ## 📚 Next Steps
 
 After installation:
 
 1. Read the [Quick Start Guide](quickstart.md)
-2. Explore [Examples](examples/)
-3. Check the [API Reference](api/README.md)
-4. Review [Configuration Options](configuration.md)
+2. Explore [Examples](../examples/)
+3. Review database setup: [Database Setup](../DATABASE_SETUP.md)
+4. Browse docs index: [Documentation](README.md)
 
 ## 🔄 Updates
 
@@ -206,7 +206,9 @@ To update the project:
 git pull origin main
 
 # Update dependencies
-pip install -r requirements.txt --upgrade
+uv pip install -e . --upgrade
+# or (without uv):
+# pip install -e . --upgrade
 
 # Update database schema (if needed)
 make setup-db

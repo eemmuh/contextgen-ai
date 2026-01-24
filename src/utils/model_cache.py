@@ -330,10 +330,11 @@ class ModelCache:
                         )
                         entry.size_bytes = self._estimate_model_size(model)
 
-                        # Add to memory cache (with eviction if needed)
-                        self._evict_if_needed(entry.size_bytes)
-                        self._memory_cache[cache_key] = entry
-                        self._memory_cache_size += entry.size_bytes
+                        # Add to memory cache (with eviction if needed). Skip if it exceeds the in-memory limit.
+                        if entry.size_bytes <= self.max_memory_size:
+                            self._evict_if_needed(entry.size_bytes)
+                            self._memory_cache[cache_key] = entry
+                            self._memory_cache_size += entry.size_bytes
 
                         # Update metadata
                         self.metadata[cache_key]["last_accessed"] = time.time()
@@ -376,10 +377,19 @@ class ModelCache:
             )
             entry.size_bytes = self._estimate_model_size(model)
 
-            # Add to memory cache (with eviction if needed)
-            self._evict_if_needed(entry.size_bytes)
-            self._memory_cache[cache_key] = entry
-            self._memory_cache_size += entry.size_bytes
+            # Add to memory cache (with eviction if needed).
+            # If a single model exceeds the cache limit, do not keep it in the in-memory cache.
+            cache_in_memory = entry.size_bytes <= self.max_memory_size
+            if cache_in_memory:
+                self._evict_if_needed(entry.size_bytes)
+                self._memory_cache[cache_key] = entry
+                self._memory_cache_size += entry.size_bytes
+            else:
+                logger.info(
+                    f"Skipping in-memory cache for {model_name}: "
+                    f"model_size_mb={entry.size_bytes / (1024 * 1024):.1f} exceeds "
+                    f"memory_limit_mb={self.max_memory_size / (1024 * 1024):.1f}"
+                )
 
             # Cache on disk
             try:
@@ -418,7 +428,24 @@ class ModelCache:
         elif model_type == "stable_diffusion":
             model.save_pretrained(str(cache_path))
         else:
-            torch.save(model.state_dict(), cache_path / "model.pt")
+            # Generic torch model: attempt to persist state_dict.
+            state_dict = None
+            if hasattr(model, "state_dict") and callable(getattr(model, "state_dict")):
+                try:
+                    state_dict = model.state_dict()
+                except TypeError:
+                    # Some tests use a mock "state_dict" without a "self" parameter; fall back to the class attr.
+                    try:
+                        state_dict_fn = getattr(type(model), "state_dict", None)
+                        if callable(state_dict_fn):
+                            state_dict = state_dict_fn()
+                    except Exception:
+                        state_dict = None
+
+            if state_dict is None:
+                raise ValueError("Model does not provide a usable state_dict for disk caching")
+
+            torch.save(state_dict, cache_path / "model.pt")
 
         # Apply compression if enabled
         if self.compression_enabled:

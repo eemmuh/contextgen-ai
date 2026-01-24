@@ -6,15 +6,17 @@
 
 ```bash
 # Clone and setup
-git clone https://github.com/yourusername/image-model-coco-model.git
-cd image-model-coco-model
+git clone https://github.com/eemmuh/contextgen-ai.git
+cd contextgen-ai
 
 # Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -e .
+# or (without uv):
+# pip install -e .
 ```
 
 ### 2. Start Database
@@ -132,7 +134,7 @@ results = embedding_manager.search_similar(
 
 ### Environment Variables
 
-Create `.env` file:
+Create a `.env` file (you can start from `env.example`):
 
 ```bash
 # Database
@@ -300,6 +302,4 @@ MODEL_CONFIG["batch_size"] = 16
 ## 🆘 Need Help?
 
 - 📖 [Full Documentation](README.md)
-- 🐛 [Report Issues](https://github.com/yourusername/image-model-coco-model/issues)
-- 💬 [Community Discord](https://discord.gg/your-community)
-- 📧 [Email Support](mailto:support@yourproject.com) 
+- 🐛 Report issues via GitHub Issues (in this repository)
