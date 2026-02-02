@@ -136,16 +136,16 @@ class DatabaseEmbeddingManager:
         Returns:
             Image ID in the database
         """
-        # Add image to database
+        # Add image to database (extra fields stored in image_metadata)
         image_id = self.database_manager.add_image(
             image_path=image_path,
             description=metadata.get("description"),
             tags=metadata.get("tags", []),
             width=metadata.get("width"),
             height=metadata.get("height"),
-            file_size_bytes=metadata.get("file_size_bytes"),
-            format=metadata.get("format"),
-            source_dataset=metadata.get("source_dataset"),
+            metadata={
+                **{k: v for k, v in metadata.items() if k not in ("description", "tags", "width", "height")},
+            },
         )
 
         if compute_embeddings:

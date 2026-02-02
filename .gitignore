@@ -161,7 +161,7 @@ cython_debug/
 logs/
 reports/
 output/
-uploads/
+uploads/          # API file uploads (safe UUID-based filenames)
 analytics/
 backups/
 embeddings/

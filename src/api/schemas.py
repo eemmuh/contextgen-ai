@@ -4,10 +4,23 @@ API schemas for request and response models.
 This module defines Pydantic models for API input validation and response formatting.
 """
 
+import re
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, field_validator
 from datetime import datetime
 from enum import Enum
+
+# Control and other unsafe characters in user text
+_CONTROL_AND_UNSAFE = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+
+
+def _sanitize_user_text(v: str) -> str:
+    """Strip and remove control/unsafe characters from user text."""
+    if not isinstance(v, str):
+        return v
+    v = v.replace("\x00", "").strip()
+    v = _CONTROL_AND_UNSAFE.sub(" ", v)
+    return re.sub(r"\s+", " ", v).strip()
 
 
 class ImageFormat(str, Enum):
@@ -31,11 +44,27 @@ class SearchRequest(BaseModel):
     k: int = Field(default=5, ge=1, le=50, description="Number of results to return")
     threshold: Optional[float] = Field(default=0.5, ge=0.0, le=1.0, description="Similarity threshold")
 
+    @field_validator("query")
+    @classmethod
+    def sanitize_query(cls, v: str) -> str:
+        out = _sanitize_user_text(v)
+        if not out:
+            raise ValueError("Query cannot be empty after sanitization")
+        return out
+
 
 class GenerationRequest(BaseModel):
     """Request model for image generation."""
     prompt: str = Field(..., min_length=1, max_length=1000, description="Text prompt for generation")
     num_images: int = Field(default=1, ge=1, le=10, description="Number of images to generate")
+
+    @field_validator("prompt")
+    @classmethod
+    def sanitize_prompt(cls, v: str) -> str:
+        out = _sanitize_user_text(v)
+        if not out:
+            raise ValueError("Prompt cannot be empty after sanitization")
+        return out
     seed: Optional[int] = Field(default=None, ge=0, description="Random seed for reproducibility")
     width: int = Field(default=512, ge=256, le=1024, description="Image width")
     height: int = Field(default=512, ge=256, le=1024, description="Image height")
@@ -47,6 +76,14 @@ class RAGGenerationRequest(BaseModel):
     """Request model for RAG-enhanced image generation."""
     prompt: str = Field(..., min_length=1, max_length=1000, description="Text prompt for generation")
     num_images: int = Field(default=1, ge=1, le=10, description="Number of images to generate")
+
+    @field_validator("prompt")
+    @classmethod
+    def sanitize_prompt(cls, v: str) -> str:
+        out = _sanitize_user_text(v)
+        if not out:
+            raise ValueError("Prompt cannot be empty after sanitization")
+        return out
     similar_examples_count: int = Field(default=3, ge=1, le=10, description="Number of similar examples to use")
     seed: Optional[int] = Field(default=None, ge=0, description="Random seed for reproducibility")
     width: int = Field(default=512, ge=256, le=1024, description="Image width")

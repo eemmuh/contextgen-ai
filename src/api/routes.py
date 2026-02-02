@@ -7,8 +7,9 @@ error handling, and performance optimizations.
 
 import time
 import os
+from pathlib import Path
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, UploadFile, File, Depends, Query, Path, BackgroundTasks
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends, Query, Path as PathParam, BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.requests import Request
 
@@ -28,6 +29,12 @@ from src.core.exceptions import (
 )
 from src.core.cache import get_cache_manager, cache_result
 from src.utils.logger import get_logger
+from src.utils.security import (
+    sanitize_filename,
+    safe_upload_filename,
+    safe_join_path,
+    validate_user_text,
+)
 from config.settings import get_settings
 
 logger = get_logger(__name__)
@@ -317,6 +324,10 @@ async def generate_with_rag(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
+# Base directory for uploads; must exist and be under app control
+UPLOADS_BASE = Path(__file__).resolve().parent.parent.parent / "uploads"
+
+
 @router.post("/upload", response_model=SuccessResponse)
 async def upload_image(
     file: UploadFile = File(...),
@@ -324,42 +335,68 @@ async def upload_image(
     tags: Optional[str] = Query(None, description="Comma-separated tags"),
     embedding_manager: DatabaseEmbeddingManager = Depends(get_embedding_manager)
 ):
-    """Upload and process an image."""
+    """Upload and process an image. File is saved to a safe path; filename is sanitized."""
     try:
-        # Validate file
+        # Validate file type
         if not file.content_type or not file.content_type.startswith("image/"):
-            raise ValidationError("file", file.filename, "File must be an image")
-        
-        if file.size and file.size > 10 * 1024 * 1024:  # 10MB limit
-            raise ValidationError("file", file.filename, "File size must be less than 10MB")
-        
-        # Process tags
+            raise ValidationError("file", file.filename or "unknown", "File must be an image")
+
+        # 10MB limit
+        max_size = 10 * 1024 * 1024
+        if file.size and file.size > max_size:
+            raise ValidationError("file", file.filename or "unknown", "File size must be less than 10MB")
+
+        # Generate safe storage path (no user-controlled path)
+        safe_name = safe_upload_filename(
+            content_type=file.content_type,
+            original_filename=file.filename,
+        )
+        uploads_dir = UPLOADS_BASE
+        uploads_dir.mkdir(parents=True, exist_ok=True)
+        safe_path = safe_join_path(uploads_dir, safe_name)
+        storage_path_str = str(safe_path)
+
+        # Stream file to disk (do not load entire file into memory)
+        with open(storage_path_str, "wb") as f:
+            while chunk := await file.read(8192):
+                f.write(chunk)
+
+        # Sanitize description and limit tags
+        safe_description = None
+        if description is not None:
+            try:
+                safe_description = validate_user_text(description, max_length=1000)
+            except ValueError:
+                safe_description = description[:1000].strip() if description else None
         tag_list = []
         if tags:
-            tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()]
-        
-        # Process uploaded image
+            tag_list = [sanitize_filename(tag.strip())[:100] for tag in tags.split(",") if tag.strip()][:50]
+
+        # Store under safe path; original filename only for display in metadata
         result = embedding_manager.add_image_with_embeddings(
-            image_path=file.filename,
+            image_path=storage_path_str,
             metadata={
-                "description": description,
+                "description": safe_description,
                 "tags": tag_list,
                 "uploaded_by": "api",
                 "content_type": file.content_type,
-                "file_size": file.size
+                "file_size": file.size,
+                "original_filename": sanitize_filename(file.filename or "upload"),
             }
         )
-        
+
         return SuccessResponse(
             message="Image uploaded successfully",
             data={"image_id": result},
             timestamp=time.time()
         )
-        
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=e.to_dict())
     except Exception as e:
-        logger.error(f"Upload error: {e}")
+        logger.error("Upload error", exc_info=False)
         raise HTTPException(status_code=500, detail="Upload failed")
 
 
@@ -410,7 +447,7 @@ async def list_images(
 
 @router.get("/images/{image_id}", response_model=ImageMetadata)
 async def get_image(
-    image_id: int = Path(..., ge=1),
+    image_id: int = PathParam(..., ge=1),
     embedding_manager: DatabaseEmbeddingManager = Depends(get_embedding_manager)
 ):
     """Get specific image details."""
@@ -440,7 +477,7 @@ async def get_image(
 
 @router.delete("/images/{image_id}", response_model=SuccessResponse)
 async def delete_image(
-    image_id: int = Path(..., ge=1),
+    image_id: int = PathParam(..., ge=1),
     embedding_manager: DatabaseEmbeddingManager = Depends(get_embedding_manager)
 ):
     """Delete an image from the database."""
@@ -493,8 +530,10 @@ async def search_with_rag(
 ):
     """Search using RAG techniques."""
     start_time = time.time()
-    
     try:
+        query = validate_user_text(query, max_length=500)
+        if not query:
+            raise HTTPException(status_code=400, detail="Query cannot be empty after sanitization")
         rag_output = rag_manager.process_query(query=query, k=k)
         
         # Convert to response format

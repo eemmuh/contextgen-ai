@@ -148,14 +148,22 @@ class EmbeddingManager:
         return results
 
     def save_index(self, path: str):
-        """Save the FAISS index and metadata store."""
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        """Save the FAISS index and metadata store. Metadata stored as JSON (safe)."""
+        import json
+        if ".." in path or "\x00" in path:
+            raise ValueError("Invalid path for index save")
+        dirname = os.path.dirname(path)
+        if dirname:
+            os.makedirs(dirname, exist_ok=True)
         faiss.write_index(self.index, f"{path}.index")
-        with open(f"{path}.metadata", "wb") as f:
-            pickle.dump(self.metadata_store, f)
+        with open(f"{path}.metadata", "w", encoding="utf-8") as f:
+            json.dump(self.metadata_store, f, default=str)
 
     def load_index(self, path: str):
-        """Load the FAISS index and metadata store."""
+        """Load the FAISS index and metadata store. Path must be trusted (e.g. under embeddings/)."""
+        import json
+        if ".." in path or "\x00" in path:
+            raise ValueError("Invalid path for index load")
         self.index = faiss.read_index(f"{path}.index")
-        with open(f"{path}.metadata", "rb") as f:
-            self.metadata_store = pickle.load(f)
+        with open(f"{path}.metadata", "r", encoding="utf-8") as f:
+            self.metadata_store = json.load(f)

@@ -190,23 +190,24 @@ class RedisCache(BaseCache):
             raise CacheError(f"Failed to connect to Redis: {e}")
     
     def _serialize(self, value: Any) -> str:
-        """Serialize value for Redis storage."""
+        """Serialize value for Redis storage. JSON only to avoid unsafe deserialization."""
+        # Pydantic models: use model_dump() so result is JSON-serializable
+        if hasattr(value, "model_dump"):
+            value = value.model_dump()
+        elif hasattr(value, "dict"):
+            value = value.dict()
         try:
             return json.dumps(value, default=str)
-        except (TypeError, ValueError):
-            # Fallback to pickle for complex objects
-            return pickle.dumps(value).hex()
-    
+        except (TypeError, ValueError) as e:
+            logger.warning("Cache value not JSON-serializable: %s", type(value).__name__)
+            raise CacheError(f"Cannot cache non-JSON-serializable value: {e}") from e
+
     def _deserialize(self, value: str) -> Any:
-        """Deserialize value from Redis storage."""
+        """Deserialize value from Redis storage. JSON only; never unpickle untrusted data."""
         try:
             return json.loads(value)
         except (json.JSONDecodeError, ValueError):
-            # Try pickle deserialization
-            try:
-                return pickle.loads(bytes.fromhex(value))
-            except Exception:
-                return value
+            return None
     
     def get(self, key: str) -> Optional[Any]:
         """Get value from cache."""
