@@ -2,6 +2,7 @@ import torch
 from diffusers import StableDiffusionPipeline
 from typing import Dict, Optional, List
 import os
+from datetime import datetime
 from PIL import Image
 import asyncio
 from src.utils.model_cache import get_model_cache
@@ -161,23 +162,37 @@ class ImageGenerator:
         
         return images
 
-    def save_images(self, images: List[Image.Image], output_dir: str, prefix: str = "generated") -> List[str]:
+    def save_images(
+        self,
+        images: List[Image.Image],
+        output_dir: str,
+        prefix: str = "generated",
+        run_id: Optional[str] = None,
+        ext: str = "png",
+    ) -> List[str]:
         """
-        Save generated images to disk.
+        Save generated images to disk with unique, sortable filenames.
+
+        Best practice: prefix_runid_index.ext so multiple runs do not overwrite
+        and files sort by run then index (e.g. generated_20250124_143022_01.png).
 
         Args:
             images: List of PIL Images to save
             output_dir: Directory to save images in
-            prefix: Prefix for image filenames
+            prefix: Prefix for image filenames (e.g. "generated", "rag")
+            run_id: Unique id for this run (default: timestamp YYYYMMDD_HHMMSS)
+            ext: File extension without dot (default: png)
 
         Returns:
             List of paths to saved images
         """
         os.makedirs(output_dir, exist_ok=True)
+        run_id = run_id or datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        ext = ext.lstrip(".").lower() or "png"
         saved_paths = []
 
         for i, image in enumerate(images):
-            filename = f"{prefix}_{i+1}.png"
+            filename = f"{prefix}_{run_id}_{i + 1:02d}.{ext}"
             path = os.path.join(output_dir, filename)
             image.save(path)
             saved_paths.append(path)
@@ -216,11 +231,13 @@ class ImageGenerator:
             fast_mode=fast_mode,
         )
 
-        # Save generated images
+        # Save generated images (run_id avoids overwriting across runs)
+        run_id = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         saved_paths = self.save_images(
             images=images,
             output_dir=output_dir,
-            prefix=f"rag_{seed if seed is not None else 'random'}",
+            prefix="rag",
+            run_id=run_id,
         )
 
         return {

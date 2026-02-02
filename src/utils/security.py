@@ -94,8 +94,9 @@ def validate_user_text(text: str, max_length: int = 10000) -> str:
 
 def safe_upload_filename(content_type: Optional[str] = None, original_filename: Optional[str] = None) -> str:
     """
-    Generate a safe storage filename for an upload (UUID + allowed extension).
+    Generate a safe storage filename for an upload.
 
+    Best practice: prefix + UUID + extension so listings are clear and names never collide.
     Prefers extension from content_type allowlist; falls back to sanitized original extension.
     """
     ext = ".bin"
@@ -106,7 +107,7 @@ def safe_upload_filename(content_type: Optional[str] = None, original_filename: 
         _, e = os.path.splitext(base)
         if e.lower() in ALLOWED_IMAGE_EXTENSIONS:
             ext = e.lower()
-    return f"{uuid.uuid4().hex}{ext}"
+    return f"upload_{uuid.uuid4().hex}{ext}"
 
 
 def is_allowed_image_extension(ext: str) -> bool:

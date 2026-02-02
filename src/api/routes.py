@@ -190,8 +190,9 @@ async def generate_image(
             # Save generated images and create URLs
             image_urls = []
             for i, image in enumerate(generated_images):
-                # Save image to disk
-                image_path = f"output/generated/{generation_id}_{i}.{request.format.value.lower()}"
+                # Save image to disk (zero-padded index for sort order)
+                ext = request.format.value.lower()
+                image_path = f"output/generated/{generation_id}_{i:02d}.{ext}"
                 os.makedirs(os.path.dirname(image_path), exist_ok=True)
                 image.save(image_path)
                 
