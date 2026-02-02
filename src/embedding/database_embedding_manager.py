@@ -46,10 +46,10 @@ class DatabaseEmbeddingManager:
         self.model_cache = get_model_cache()
 
         # Initialize models with caching
-        logger.info(f"🔄 Loading text model: {text_model_name}")
+        logger.info(f"Loading text model: {text_model_name}")
         self.text_model = self._load_text_model(text_model_name)
 
-        logger.info(f"🔄 Loading image model: {image_model_name}")
+        logger.info(f"Loading image model: {image_model_name}")
         self.image_model, self.image_processor = self._load_image_model(image_model_name)
 
     def _load_text_model(self, model_name: str) -> SentenceTransformer:
@@ -63,7 +63,7 @@ class DatabaseEmbeddingManager:
             return cached_model
 
         # Load from HuggingFace and cache
-        logger.info(f"📥 Downloading text model: {model_name}")
+        logger.info(f"Downloading text model: {model_name}")
         model = SentenceTransformer(model_name, device=self.device)
 
         # Cache the model
@@ -87,7 +87,7 @@ class DatabaseEmbeddingManager:
             return cached_model, processor
 
         # Load from HuggingFace and cache
-        logger.info(f"📥 Downloading image model: {model_name}")
+        logger.info(f"Downloading image model: {model_name}")
         model = CLIPModel.from_pretrained(model_name).to(self.device)
         processor = CLIPProcessor.from_pretrained(model_name)
 

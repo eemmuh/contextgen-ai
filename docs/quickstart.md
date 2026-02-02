@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-## ⚡ Quick Setup
+## Quick Setup
 
 ### 1. Install Dependencies
 
@@ -39,7 +39,7 @@ python examples/basic_usage.py
 python examples/database_usage.py
 ```
 
-## 🎯 Basic Usage
+## Basic Usage
 
 ### Simple Image Search
 
@@ -96,7 +96,7 @@ generated_image = generator.generate(augmented_prompt)
 generated_image.save("output/generated_cat.png")
 ```
 
-## 📊 Database Operations
+## Database Operations
 
 ### View Database Statistics
 
@@ -130,7 +130,7 @@ results = embedding_manager.search_similar(
 )
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -161,7 +161,7 @@ MODEL_CONFIG = {
 }
 ```
 
-## 🚀 Advanced Features
+## Advanced Features
 
 ### Batch Processing
 
@@ -210,7 +210,7 @@ embedding_manager = DatabaseEmbeddingManager()
 # Subsequent loads: uses cached version
 ```
 
-## 📈 Monitoring & Logging
+## Monitoring & Logging
 
 ### View Logs
 
@@ -237,7 +237,7 @@ db_manager.add_system_metrics(
 metrics = db_manager.get_system_metrics_history(hours=24)
 ```
 
-## 🎨 Example Workflows
+## Example Workflows
 
 ### Complete RAG Pipeline
 
@@ -269,7 +269,7 @@ def generate_with_rag(prompt: str, num_results: int = 3):
 image, context = generate_with_rag("a cat playing in a garden")
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -291,7 +291,7 @@ python -c "from src.embedding.database_embedding_manager import DatabaseEmbeddin
 MODEL_CONFIG["batch_size"] = 16
 ```
 
-## 📚 Next Steps
+## Next Steps
 
 1. **Explore Examples**: Check out all examples in `examples/`
 2. **Read Documentation**: Visit the [full documentation](README.md)
@@ -299,7 +299,7 @@ MODEL_CONFIG["batch_size"] = 16
 4. **Scale Up**: Add more images and embeddings
 5. **Contribute**: Help improve the project!
 
-## 🆘 Need Help?
+## Need Help?
 
-- 📖 [Full Documentation](README.md)
-- 🐛 Report issues via GitHub Issues (in this repository)
+- [Full Documentation](README.md)
+- Report issues via GitHub Issues (in this repository)

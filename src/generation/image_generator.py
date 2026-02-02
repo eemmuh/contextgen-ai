@@ -32,7 +32,7 @@ class ImageGenerator:
         self.model_cache = get_model_cache()
 
         # Initialize the pipeline with caching
-        print(f"🔄 Loading Stable Diffusion model: {model_id}")
+        print(f"Loading Stable Diffusion model: {model_id}")
         self.pipeline = self._load_stable_diffusion_model(model_id)
 
         if device == "cuda":
@@ -58,7 +58,7 @@ class ImageGenerator:
             return cached_model
 
         # Load from HuggingFace and cache
-        print(f"📥 Downloading Stable Diffusion model: {model_id}")
+        print(f"Downloading Stable Diffusion model: {model_id}")
         pipeline = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch_dtype)
         pipeline = pipeline.to(self.device)
 

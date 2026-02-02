@@ -131,10 +131,10 @@ class RAGManager:
 
         # Show RAG enhancement summary
         if similar_examples:
-            print(f"🎯 RAG Enhancement: Found {len(similar_examples)} similar examples")
+            print(f"RAG enhancement: Found {len(similar_examples)} similar examples")
             print(f"   Enhanced prompt: {augmented_prompt}")
         else:
-            print("ℹ️  No similar examples found - using original prompt")
+            print("No similar examples found - using original prompt")
 
         return {
             "original_query": query,

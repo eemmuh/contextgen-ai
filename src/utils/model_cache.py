@@ -308,14 +308,14 @@ class ModelCache:
                 # Move to end (most recently used)
                 self._memory_cache.move_to_end(cache_key)
                 self.stats["cache_hits"] += 1
-                logger.info(f"📦 Memory cache hit: {model_name}")
+                logger.info(f"Memory cache hit: {model_name}")
                 return entry.model
 
             # Check disk cache
             cache_path = self.cache_dir / cache_key
             if cache_path.exists() and cache_key in self.metadata:
                 try:
-                    logger.info(f"💾 Loading from disk cache: {model_name}")
+                    logger.info(f"Loading from disk cache: {model_name}")
                     model = self._load_model_from_disk(model_type, cache_path, device, **kwargs)
 
                     if model is not None and self._validate_cached_model(model, model_type):
@@ -409,7 +409,7 @@ class ModelCache:
                 }
                 self._save_metadata()
 
-                logger.info(f"💾 Cached {model_type} model: {model_name}")
+                logger.info(f"Cached {model_type} model: {model_name}")
 
             except Exception as e:
                 logger.error(f"Failed to cache model to disk: {e}")

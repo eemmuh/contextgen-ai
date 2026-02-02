@@ -1,6 +1,6 @@
 # Installation Guide
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### System Requirements
 - **Python**: 3.9 or higher
@@ -14,7 +14,7 @@
 - Git
 - Docker & Docker Compose (for database)
 
-## 🚀 Installation Steps
+## Installation Steps
 
 ### 1. Clone the Repository
 
@@ -67,7 +67,7 @@ The system will automatically download required models on first use:
 - Sentence Transformers: `all-MiniLM-L6-v2`
 - CLIP: `openai/clip-vit-base-patch32`
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -92,7 +92,7 @@ BATCH_SIZE=32
 - `config/config.py`: Model/dataset/database defaults used by scripts
 - `config/environments/`: Environment-specific settings
 
-## 🧪 Verify Installation
+## Verify Installation
 
 ### Run Basic Test
 
@@ -118,7 +118,7 @@ pytest tests/
 pytest tests/integration/test_database_integration.py
 ```
 
-## 🐳 Docker Installation (Alternative)
+## Docker Installation (Alternative)
 
 If you prefer using Docker for the entire application:
 
@@ -130,7 +130,7 @@ docker build -t image-model-coco .
 docker-compose up -d
 ```
 
-## 📦 Development Installation
+## Development Installation
 
 For development work:
 
@@ -148,7 +148,7 @@ make lint
 make format
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -188,7 +188,7 @@ lsof -i :5433
 
 - Review open issues: [GitHub Issues](https://github.com/eemmuh/contextgen-ai/issues)
 
-## 📚 Next Steps
+## Next Steps
 
 After installation:
 
@@ -197,7 +197,7 @@ After installation:
 3. Review database setup: [Database Setup](../DATABASE_SETUP.md)
 4. Browse docs index: [Documentation](README.md)
 
-## 🔄 Updates
+## Updates
 
 To update the project:
 

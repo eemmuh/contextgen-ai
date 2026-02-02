@@ -442,12 +442,12 @@ def main():
         # Generate report
         report_path = analytics.generate_report(output_format=args.format, include_charts=not args.no_charts)
 
-        print(f"✅ Analytics report generated: {report_path}")
+        print(f"Analytics report generated: {report_path}")
 
         # Print basic stats to console
         stats = analytics.get_basic_stats()
         if stats:
-            print(f"\n📊 Quick Stats:")
+            print("\nQuick Stats:")
             print(f"   Images: {stats.get('images_count', 0):,}")
             print(f"   Embeddings: {stats.get('embeddings_count', 0):,}")
             print(f"   Generations: {stats.get('generations_count', 0):,}")

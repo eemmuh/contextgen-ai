@@ -29,7 +29,7 @@ def print_cache_info():
     cache = get_model_cache()
     info = cache.get_cache_info()
 
-    print("📊 Cache Information")
+    print("Cache Information")
     print("=" * 50)
     print(f"Memory Cache: {info['memory_cache_size']} models ({info['memory_cache_size_mb']:.1f} MB)")
     print(f"Disk Cache: {info['disk_cache_size']} models ({info['disk_cache_size_mb']:.1f} MB)")
@@ -59,20 +59,20 @@ def clear_cache(model_type=None):
     cache = get_model_cache()
 
     if model_type:
-        print(f"🗑️ Clearing {model_type} models from cache...")
+        print(f"Clearing {model_type} models from cache...")
         cache.clear_cache(model_type)
-        print(f"✅ Cleared {model_type} models from cache")
+        print(f"Cleared {model_type} models from cache")
     else:
-        print("🗑️ Clearing all cache entries...")
+        print("Clearing all cache entries...")
         cache.clear_cache()
-        print("✅ Cleared all cache entries")
+        print("Cleared all cache entries")
 
 
 def optimize_cache():
     """Optimize the cache by removing old entries."""
     cache = get_model_cache()
 
-    print("🔧 Optimizing cache...")
+    print("Optimizing cache...")
     start_time = time.time()
 
     # Get initial stats
@@ -89,43 +89,43 @@ def optimize_cache():
     optimization_time = time.time() - start_time
     space_saved = initial_size - final_size
 
-    print(f"✅ Cache optimization completed in {optimization_time:.2f} seconds")
-    print(f"📉 Space saved: {space_saved:.1f} MB")
-    print(f"📊 New total size: {final_size:.1f} MB")
+    print(f"Cache optimization completed in {optimization_time:.2f} seconds")
+    print(f"Space saved: {space_saved:.1f} MB")
+    print(f"New total size: {final_size:.1f} MB")
 
 
 def warmup_cache():
     """Warm up the cache with frequently used models."""
     cache = get_model_cache()
 
-    print("🔥 Warming up cache...")
+    print("Warming up cache...")
     start_time = time.time()
 
     warmup_models = CACHE_CONFIG.get("warmup_models", [])
     if not warmup_models:
-        print("⚠️ No warmup models configured")
+        print("No warmup models configured")
         return
 
     cache.warmup_cache(warmup_models)
 
     warmup_time = time.time() - start_time
-    print(f"✅ Cache warmup completed in {warmup_time:.2f} seconds")
+    print(f"Cache warmup completed in {warmup_time:.2f} seconds")
 
 
 def reset_stats():
     """Reset cache statistics."""
     cache = get_model_cache()
 
-    print("🔄 Resetting cache statistics...")
+    print("Resetting cache statistics...")
     cache.reset_stats()
-    print("✅ Cache statistics reset")
+    print("Cache statistics reset")
 
 
 def monitor_cache(duration=60, interval=5):
     """Monitor cache performance in real-time."""
     cache = get_model_cache()
 
-    print(f"📈 Monitoring cache for {duration} seconds (interval: {interval}s)")
+    print(f"Monitoring cache for {duration} seconds (interval: {interval}s)")
     print("Press Ctrl+C to stop monitoring")
     print("-" * 80)
     print(f"{'Time':<8} {'Memory':<10} {'Disk':<10} {'Hit Rate':<10} {'Requests':<10}")
@@ -153,7 +153,7 @@ def monitor_cache(duration=60, interval=5):
             time.sleep(interval)
 
     except KeyboardInterrupt:
-        print("\n⏹️ Monitoring stopped by user")
+        print("\nMonitoring stopped by user")
 
 
 def export_cache_info(output_file):
@@ -168,7 +168,7 @@ def export_cache_info(output_file):
     with open(output_file, "w") as f:
         json.dump(info, f, indent=2)
 
-    print(f"📄 Cache information exported to {output_file}")
+    print(f"Cache information exported to {output_file}")
 
 
 def main():
@@ -229,7 +229,7 @@ def main():
             export_cache_info(args.output)
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         sys.exit(1)
 
 

@@ -6,7 +6,17 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, Float, DateTime, Boolean, JSON
 from sqlalchemy.ext.declarative import declarative_base
 
+try:
+    from pgvector.sqlalchemy import Vector
+    PGVECTOR_AVAILABLE = True
+except ImportError:
+    PGVECTOR_AVAILABLE = False
+    Vector = None
+
 Base = declarative_base()
+
+# Embedding dimension used by default (all-MiniLM-L6-v2, etc.)
+EMBEDDING_DIM = 384
 
 
 class Image(Base):
@@ -26,13 +36,18 @@ class Image(Base):
 
 
 class Embedding(Base):
-    """Embedding model for storing vector embeddings."""
+    """Embedding model for storing vector embeddings (native pgvector when available)."""
 
     __tablename__ = "embeddings"
 
     id = Column(Integer, primary_key=True, index=True)
     image_id = Column(Integer, nullable=False, index=True)
-    embedding = Column(JSON, nullable=False)  # Store as JSON array
+    # Native vector(384) for indexed similarity search when pgvector is installed; otherwise JSON fallback
+    embedding = (
+        Column(Vector(EMBEDDING_DIM), nullable=False)
+        if PGVECTOR_AVAILABLE
+        else Column(JSON, nullable=False)
+    )
     model_type = Column(String(100), nullable=False, index=True)
     model_name = Column(String(200), nullable=False)
     embedding_type = Column(String(50), default="text")  # text, image, etc.
@@ -41,10 +56,11 @@ class Embedding(Base):
 
     @classmethod
     def from_numpy(cls, embedding, image_id, model_type, model_name, embedding_type="text", embedding_metadata=None):
-        """Create embedding from numpy array."""
+        """Create embedding from numpy array (list for pgvector or JSON)."""
+        vec = embedding.tolist() if hasattr(embedding, "tolist") else list(embedding)
         return cls(
             image_id=image_id,
-            embedding=embedding.tolist(),
+            embedding=vec,
             model_type=model_type,
             model_name=model_name,
             embedding_type=embedding_type,

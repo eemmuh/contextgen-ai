@@ -248,7 +248,7 @@ class DatabaseHealthChecker:
 
     def run_all_checks(self):
         """Run all health checks."""
-        logger.info("🔍 Starting database health check...")
+        logger.info("Starting database health check...")
 
         checks = [
             ("connection", self.check_connection),
@@ -295,11 +295,11 @@ class DatabaseHealthChecker:
         print("-" * 60)
 
         for check_name, check_data in self.health_report["checks"].items():
-            status_icon = {"healthy": "✅", "warning": "⚠️", "failed": "❌", "error": "💥"}.get(
-                check_data["status"], "❓"
+            status_label = {"healthy": "OK", "warning": "WARN", "failed": "FAIL", "error": "ERROR"}.get(
+                check_data["status"], "UNKNOWN"
             )
 
-            print(f"{status_icon} {check_name.upper()}: {check_data['status']}")
+            print(f"[{status_label}] {check_name.upper()}: {check_data['status']}")
             print(f"   {check_data['message']}")
 
             if "details" in check_data:

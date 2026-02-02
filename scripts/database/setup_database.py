@@ -169,10 +169,10 @@ def main():
     try:
         if args.verify_only:
             if verify_database_setup():
-                logger.info("✅ Database setup verification passed")
+                logger.info("Database setup verification passed")
                 return 0
             else:
-                logger.error("❌ Database setup verification failed")
+                logger.error("Database setup verification failed")
                 return 1
 
         # Setup pgvector extension
@@ -191,10 +191,10 @@ def main():
 
         # Verify setup
         if verify_database_setup():
-            logger.info("✅ Database setup completed successfully")
+            logger.info("Database setup completed successfully")
             return 0
         else:
-            logger.error("❌ Database setup failed verification")
+            logger.error("Database setup failed verification")
             return 1
 
     except Exception as e:

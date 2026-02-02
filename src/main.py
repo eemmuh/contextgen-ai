@@ -44,7 +44,7 @@ def process_dataset(
         embedding_manager = EmbeddingManager()
 
     # Process each item in the dataset
-    logger.info(f"📊 Processing {len(dataset)} images...")
+    logger.info(f"Processing {len(dataset)} images...")
 
     for i in range(len(dataset)):
         if i % 20 == 0:  # Progress indicator
@@ -106,7 +106,7 @@ def main():
     if args.cache_info:
         model_cache = get_model_cache()
         cache_info = model_cache.get_cache_info()
-        logger.info("📊 Model Cache Information:")
+        logger.info("Model Cache Information:")
         logger.info(f"   Memory cache size: {cache_info['memory_cache_size']} models")
         logger.info(f"   Disk cache size: {cache_info['disk_cache_size']} models")
         logger.info(f"   Total cache size: {cache_info['total_size_bytes'] / (1024*1024):.2f} MB")
@@ -148,14 +148,14 @@ def main():
         for path in possible_paths:
             try:
                 embedding_manager.load_index(path)
-                logger.info(f"✅ Loaded embeddings from: {path}")
+                logger.info(f"Loaded embeddings from: {path}")
                 embedding_loaded = True
                 break
             except (FileNotFoundError, RuntimeError):
                 continue
 
         if not embedding_loaded:
-            logger.warning(f"❌ No existing embeddings found. Please run with --process-dataset first.")
+            logger.warning("No existing embeddings found. Please run with --process-dataset first.")
             return
 
     # Initialize RAG and image generation components

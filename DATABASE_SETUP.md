@@ -23,7 +23,7 @@ This guide will help you set up PostgreSQL with pgvector for the RAG-based Image
 
 4. **Test the connection**
    ```bash
-   python -c "from src.database.session import test_connection; print('✅ Connected!' if test_connection() else '❌ Failed')"
+   python -c "from src.database.session import test_connection; print('Connected' if test_connection() else 'Failed')"
    ```
 
 5. **Run database examples**

@@ -33,10 +33,10 @@ class EmbeddingManager:
         self.model_cache = get_model_cache()
 
         # Initialize models with caching
-        print(f"🔄 Loading text model: {text_model_name}")
+        print(f"Loading text model: {text_model_name}")
         self.text_model = self._load_text_model(text_model_name)
 
-        print(f"🔄 Loading image model: {image_model_name}")
+        print(f"Loading image model: {image_model_name}")
         self.image_model, self.image_processor = self._load_image_model(image_model_name)
 
         # Initialize FAISS index
@@ -54,7 +54,7 @@ class EmbeddingManager:
             return cached_model
 
         # Load from HuggingFace and cache
-        print(f"📥 Downloading text model: {model_name}")
+        print(f"Downloading text model: {model_name}")
         model = SentenceTransformer(model_name, device=self.device)
 
         # Cache the model
@@ -78,7 +78,7 @@ class EmbeddingManager:
             return cached_model, processor
 
         # Load from HuggingFace and cache
-        print(f"📥 Downloading image model: {model_name}")
+        print(f"Downloading image model: {model_name}")
         model = CLIPModel.from_pretrained(model_name).to(self.device)
         processor = CLIPProcessor.from_pretrained(model_name)
 

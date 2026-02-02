@@ -121,13 +121,13 @@ class DatabaseBackup:
             with open(metadata_path, "w") as f:
                 json.dump(metadata, f, indent=2)
 
-            logger.info(f"✅ Backup created successfully: {backup_path}")
+            logger.info(f"Backup created successfully: {backup_path}")
             logger.info(f"   Size: {backup_path.stat().st_size / 1024 / 1024:.2f} MB")
 
             return str(backup_path)
 
         except Exception as e:
-            logger.error(f"❌ Backup failed: {e}")
+            logger.error(f"Backup failed: {e}")
             if backup_path.exists():
                 backup_path.unlink()
             raise
@@ -175,11 +175,11 @@ class DatabaseBackup:
             if result.returncode != 0:
                 raise Exception(f"psql restore failed: {result.stderr}")
 
-            logger.info("✅ Backup restored successfully")
+            logger.info("Backup restored successfully")
             return True
 
         except Exception as e:
-            logger.error(f"❌ Restore failed: {e}")
+            logger.error(f"Restore failed: {e}")
             raise
 
     def list_backups(self) -> list:
@@ -256,18 +256,18 @@ def main():
 
         if args.action == "backup":
             backup_path = backup_util.create_backup(compress=not args.no_compress, include_metadata=True)
-            print(f"✅ Backup created: {backup_path}")
+            print(f"Backup created: {backup_path}")
 
         elif args.action == "restore":
             if not args.file:
-                print("❌ Error: --file argument required for restore action")
+                print("Error: --file argument required for restore action")
                 return 1
 
             success = backup_util.restore_backup(args.file, args.drop_existing)
             if success:
-                print("✅ Backup restored successfully")
+                print("Backup restored successfully")
             else:
-                print("❌ Backup restore failed")
+                print("Backup restore failed")
                 return 1
 
         elif args.action == "list":
@@ -279,7 +279,7 @@ def main():
                 print("-" * 80)
                 for backup in backups:
                     size_mb = backup["size_bytes"] / 1024 / 1024
-                    print(f"📁 {backup['filename']}")
+                    print(f"- {backup['filename']}")
                     print(f"   Size: {size_mb:.2f} MB")
                     print(f"   Modified: {backup['modified']}")
                     if backup["metadata"]:
@@ -288,7 +288,7 @@ def main():
 
         elif args.action == "cleanup":
             deleted_count = backup_util.cleanup_old_backups(args.keep_days)
-            print(f"✅ Cleaned up {deleted_count} old backup(s)")
+            print(f"Cleaned up {deleted_count} old backup(s)")
 
         return 0
 

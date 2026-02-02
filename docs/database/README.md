@@ -2,7 +2,7 @@
 
 This document covers the PostgreSQL database integration with pgvector for vector similarity search and comprehensive data management.
 
-## 🗄️ Overview
+## Overview
 
 The system uses PostgreSQL with the pgvector extension to provide:
 - **Vector similarity search** for fast image retrieval
@@ -11,7 +11,7 @@ The system uses PostgreSQL with the pgvector extension to provide:
 - **Scalable architecture** for large datasets
 - **Performance monitoring** and analytics
 
-## 🏗️ Database Schema
+## Database Schema
 
 ### Core Tables
 
@@ -35,15 +35,18 @@ CREATE TABLE images (
 ```sql
 CREATE TABLE embeddings (
     id SERIAL PRIMARY KEY,
-    image_id INTEGER REFERENCES images(id),
-    embedding vector(384),  -- Vector similarity search
-    model_type VARCHAR(50),
+    image_id INTEGER NOT NULL,
+    embedding vector(384),  -- Native pgvector for indexed similarity search
+    model_type VARCHAR(100),
     model_name VARCHAR(200),
-    embedding_type VARCHAR(20),  -- text, image, combined
+    embedding_type VARCHAR(50),  -- text, image, etc.
     embedding_metadata JSONB,
     created_at TIMESTAMP DEFAULT NOW()
 );
 ```
+
+**Why native `vector(384)` instead of JSON?**  
+Storing embeddings in a native pgvector column is preferred over JSON because: (1) **performance** — the database can use IVFFlat or HNSW indexes for approximate nearest-neighbor search instead of scanning and scoring in application code; (2) **operators** — pgvector provides `<=>` (cosine distance), `<->` (L2), and index support; (3) **storage** — native vectors are compact and type-safe. The application uses the `pgvector` Python package and `Vector(384)` in SQLAlchemy when the extension is available; without it, a JSON fallback is used and similarity is computed in Python (not scalable for large tables).
 
 #### Generations Table
 ```sql
@@ -107,7 +110,7 @@ CREATE TABLE user_sessions (
 );
 ```
 
-## 🚀 Setup
+## Setup
 
 ### 1. Install PostgreSQL and pgvector
 
@@ -164,7 +167,7 @@ make setup-db
 python scripts/setup_database.py
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -190,7 +193,7 @@ DATABASE_CONFIG = {
 }
 ```
 
-## 📊 Usage Examples
+## Usage Examples
 
 ### Database Manager
 
@@ -263,7 +266,7 @@ for result in results:
     print(f"Similarity: {result['similarity_score']:.3f}")
 ```
 
-## 🔍 Vector Similarity Search
+## Vector Similarity Search
 
 ### pgvector Operators
 
@@ -307,7 +310,7 @@ CREATE INDEX idx_embeddings_created_at ON embeddings(created_at);
 CREATE INDEX idx_embeddings_vector ON embeddings USING ivfflat (embedding vector_cosine_ops);
 ```
 
-## 📈 Monitoring and Analytics
+## Monitoring and Analytics
 
 ### System Metrics
 
@@ -339,7 +342,7 @@ print(f"Recent generations: {stats['recent_generations']}")
 print(f"Average generation time: {stats['avg_generation_time_ms']:.1f}ms")
 ```
 
-## 🔄 Migration
+## Migration
 
 ### From FAISS to Database
 
@@ -371,7 +374,7 @@ migrate_faiss_to_database(
 )
 ```
 
-## 🛠️ Management Commands
+## Management Commands
 
 ### Makefile Commands
 
@@ -407,7 +410,7 @@ python scripts/migrate_to_database.py --help
 python examples/database_usage.py
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -472,7 +475,7 @@ ANALYZE generations;
 EXPLAIN ANALYZE SELECT * FROM embeddings WHERE model_type = 'sentence_transformer';
 ```
 
-## 📚 Additional Resources
+## Additional Resources
 
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [pgvector Documentation](https://github.com/pgvector/pgvector)

@@ -4,10 +4,12 @@ Database manager for the RAG-based Image Generation System.
 
 import logging
 from datetime import datetime, timedelta
+
+import numpy as np
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-from .models import Base, Image, Generation, SystemMetrics
+from .models import Base, Image, Embedding, Generation, SystemMetrics, PGVECTOR_AVAILABLE
 from .session import get_db_session
 
 logger = logging.getLogger(__name__)
@@ -53,7 +55,7 @@ class DatabaseManager:
                 tags=tags or [],
                 width=width,
                 height=height,
-                metadata=metadata or {},
+                image_metadata=metadata or {},
             )
             session.add(image)
             session.commit()
@@ -65,6 +67,11 @@ class DatabaseManager:
         """Get image by ID."""
         with self.get_session() as session:
             return session.query(Image).filter(Image.id == image_id).first()
+
+    def get_image_by_path(self, image_path: str):
+        """Get image by path."""
+        with self.get_session() as session:
+            return session.query(Image).filter(Image.image_path == image_path).first()
 
     def get_all_images(self, limit: int = 100, offset: int = 0):
         """Get all images with pagination."""
@@ -81,6 +88,105 @@ class DatabaseManager:
                 logger.info(f"Deleted image with ID: {image_id}")
                 return True
             return False
+
+    def add_embedding(
+        self,
+        image_id: int,
+        embedding,
+        model_type: str,
+        model_name: str,
+        embedding_type: str = "text",
+        embedding_metadata: dict = None,
+    ) -> int:
+        """Add an embedding (numpy array or list) for an image."""
+        vec = embedding.tolist() if hasattr(embedding, "tolist") else list(embedding)
+        with self.get_session() as session:
+            row = Embedding(
+                image_id=image_id,
+                embedding=vec,
+                model_type=model_type,
+                model_name=model_name,
+                embedding_type=embedding_type,
+                embedding_metadata=embedding_metadata or {},
+            )
+            session.add(row)
+            session.commit()
+            session.refresh(row)
+            logger.info(f"Added embedding for image_id={image_id} type={embedding_type}")
+            return row.id
+
+    def search_similar_embeddings(
+        self,
+        query_embedding,
+        model_type: str,
+        embedding_type: str = "text",
+        k: int = 5,
+        similarity_threshold: float = 0.0,
+    ) -> list:
+        """Return similar embeddings with similarity scores (uses pgvector when available)."""
+        vec = query_embedding.tolist() if hasattr(query_embedding, "tolist") else list(query_embedding)
+        with self.get_session() as session:
+            if PGVECTOR_AVAILABLE:
+                try:
+                    from pgvector.psycopg2 import register_vector
+                    register_vector(session.connection().connection)
+                except Exception:
+                    pass
+                # Cosine distance: 1 - cosine_sim; lower is more similar. ORDER BY embedding <=> :vec
+                stmt = text(
+                    """
+                    SELECT e.id, e.image_id, e.model_type, e.model_name, e.embedding_type,
+                           1 - (e.embedding <=> :vec) AS similarity_score
+                    FROM embeddings e
+                    WHERE e.model_type = :model_type AND e.embedding_type = :embedding_type
+                    ORDER BY e.embedding <=> :vec
+                    LIMIT :lim
+                    """
+                )
+                rows = session.execute(
+                    stmt,
+                    {"vec": vec, "model_type": model_type, "embedding_type": embedding_type, "lim": max(k, 100)},
+                ).fetchall()
+                results = [
+                    {
+                        "id": r.id,
+                        "image_id": r.image_id,
+                        "model_type": r.model_type,
+                        "model_name": r.model_name,
+                        "embedding_type": r.embedding_type,
+                        "similarity_score": float(r.similarity_score),
+                    }
+                    for r in rows
+                ]
+            else:
+                # Fallback: load candidates and score in Python (no index)
+                q = (
+                    session.query(Embedding)
+                    .filter(Embedding.model_type == model_type, Embedding.embedding_type == embedding_type)
+                    .limit(500)
+                )
+                candidates = q.all()
+                qv = np.array(vec, dtype=np.float32)
+                scored = []
+                for e in candidates:
+                    ev = np.array(e.embedding, dtype=np.float32)
+                    sim = float(np.dot(qv, ev) / (np.linalg.norm(qv) * np.linalg.norm(ev) + 1e-9))
+                    scored.append((e, sim))
+                scored.sort(key=lambda x: -x[1])
+                results = [
+                    {
+                        "id": e.id,
+                        "image_id": e.image_id,
+                        "model_type": e.model_type,
+                        "model_name": e.model_name,
+                        "embedding_type": e.embedding_type,
+                        "similarity_score": sim,
+                    }
+                    for e, sim in scored[:k]
+                ]
+            if similarity_threshold > 0:
+                results = [r for r in results if r["similarity_score"] >= similarity_threshold]
+            return results[:k]
 
     def add_generation(
         self,
@@ -164,6 +270,9 @@ class DatabaseManager:
             # Count system metrics
             metrics_count = session.query(SystemMetrics).count()
 
+            # Count embeddings
+            embedding_count = session.query(Embedding).count()
+
             # Get recent activity
             recent_generations = (
                 session.query(Generation)
@@ -181,6 +290,7 @@ class DatabaseManager:
                 "total_images": image_count,
                 "total_generations": generation_count,
                 "total_metrics": metrics_count,
+                "total_embeddings": embedding_count,
                 "recent_generations": len(recent_generations),
                 "avg_generation_time_ms": avg_generation_time or 0,
             }

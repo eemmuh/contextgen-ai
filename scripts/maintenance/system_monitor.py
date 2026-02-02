@@ -38,12 +38,12 @@ from src.utils.error_handler import get_error_handler
 
 def print_system_overview():
     """Print comprehensive system overview."""
-    print("🔍 System Overview")
+    print("System Overview")
     print("=" * 60)
 
     # System metrics
     system_metrics = get_system_metrics()
-    print(f"📊 System Metrics:")
+    print("System Metrics:")
     print(f"   Memory: {system_metrics['memory']['rss_mb']:.1f} MB ({system_metrics['memory']['percent']:.1f}%)")
     print(f"   CPU: {system_metrics['cpu']['percent']:.1f}% ({system_metrics['cpu']['count']} cores)")
     print(f"   Disk: {system_metrics['disk']['usage_percent']:.1f}% used")
@@ -56,7 +56,7 @@ def print_system_overview():
     # Cache information
     cache = get_model_cache()
     cache_info = cache.get_cache_info()
-    print(f"\n💾 Cache Information:")
+    print("\nCache Information:")
     print(f"   Memory Cache: {cache_info['memory_cache_size']} models ({cache_info['memory_cache_size_mb']:.1f} MB)")
     print(f"   Disk Cache: {cache_info['disk_cache_size']} models ({cache_info['disk_cache_size_mb']:.1f} MB)")
     print(f"   Hit Rate: {cache_info['hit_rate_percent']:.1f}%")
@@ -65,7 +65,7 @@ def print_system_overview():
     # Performance summary
     perf_summary = get_performance_summary()
     if perf_summary:
-        print(f"\n⚡ Performance Summary:")
+        print("\nPerformance Summary:")
         print(f"   Total Operations: {perf_summary['total_operations']}")
         print(f"   Average Duration: {perf_summary['avg_duration']:.3f}s")
         print(f"   Max Duration: {perf_summary['max_duration']:.3f}s")
@@ -73,7 +73,7 @@ def print_system_overview():
 
     # Health status
     health_summary = get_health_summary()
-    print(f"\n🏥 Health Status:")
+    print("\nHealth Status:")
     print(f"   Overall Status: {health_summary['overall_status']}")
     print(f"   Healthy Checks: {health_summary['healthy_checks']}")
     print(f"   Warning Checks: {health_summary['warning_checks']}")
@@ -82,21 +82,21 @@ def print_system_overview():
 
 def print_detailed_health():
     """Print detailed health check results."""
-    print("\n🏥 Detailed Health Check Results")
+    print("\nDetailed Health Check Results")
     print("=" * 60)
 
     results = run_health_check()
 
     for check_name, result in results.items():
-        status_emoji = {
-            "healthy": "✅",
-            "warning": "⚠️",
-            "critical": "❌",
-            "unknown": "❓",
+        status_label = {
+            "healthy": "OK",
+            "warning": "WARN",
+            "critical": "FAIL",
+            "unknown": "UNKNOWN",
         }
 
-        emoji = status_emoji.get(result.status.value, "❓")
-        print(f"{emoji} {check_name.upper()}: {result.message}")
+        label = status_label.get(result.status.value, "UNKNOWN")
+        print(f"[{label}] {check_name.upper()}: {result.message}")
         print(f"   Response Time: {result.response_time:.1f}ms")
 
         if result.details:
@@ -109,7 +109,7 @@ def print_detailed_health():
 
 def print_performance_details():
     """Print detailed performance information."""
-    print("\n⚡ Detailed Performance Information")
+    print("\nDetailed Performance Information")
     print("=" * 60)
 
     perf_summary = get_performance_summary()
@@ -139,7 +139,7 @@ def print_performance_details():
 
 def print_cache_details():
     """Print detailed cache information."""
-    print("\n💾 Detailed Cache Information")
+    print("\nDetailed Cache Information")
     print("=" * 60)
 
     cache = get_model_cache()
@@ -173,7 +173,7 @@ def print_cache_details():
 
 def real_time_monitoring(duration: int = 60, interval: int = 5):
     """Real-time monitoring with periodic updates."""
-    print(f"\n📈 Real-time Monitoring (Duration: {duration}s, Interval: {interval}s)")
+    print(f"\nReal-time Monitoring (Duration: {duration}s, Interval: {interval}s)")
     print("=" * 60)
     print("Press Ctrl+C to stop monitoring")
     print("-" * 60)
@@ -203,14 +203,14 @@ def real_time_monitoring(duration: int = 60, interval: int = 5):
             time.sleep(interval)
 
     except KeyboardInterrupt:
-        print("\n⏹️ Monitoring stopped by user")
+        print("\nMonitoring stopped by user")
     finally:
         perf_monitor.stop_monitoring()
 
 
 def export_reports(output_dir: str = "reports"):
     """Export comprehensive system reports."""
-    print(f"\n📄 Exporting Reports to {output_dir}")
+    print(f"\nExporting Reports to {output_dir}")
     print("=" * 60)
 
     # Create output directory
@@ -222,26 +222,26 @@ def export_reports(output_dir: str = "reports"):
     # Export performance metrics
     perf_file = output_path / f"performance_report_{timestamp}.json"
     get_performance_monitor().export_metrics(str(perf_file))
-    print(f"✅ Performance report: {perf_file}")
+    print(f"Performance report: {perf_file}")
 
     # Export health report
     health_file = output_path / f"health_report_{timestamp}.json"
     get_health_checker().export_health_report(str(health_file))
-    print(f"✅ Health report: {health_file}")
+    print(f"Health report: {health_file}")
 
     # Export cache information
     cache_file = output_path / f"cache_report_{timestamp}.json"
     cache_info = get_model_cache().get_cache_info()
     with open(cache_file, "w") as f:
         json.dump(cache_info, f, indent=2, default=str)
-    print(f"✅ Cache report: {cache_file}")
+    print(f"Cache report: {cache_file}")
 
     # Export system metrics
     system_file = output_path / f"system_report_{timestamp}.json"
     system_metrics = get_system_metrics()
     with open(system_file, "w") as f:
         json.dump(system_metrics, f, indent=2, default=str)
-    print(f"✅ System report: {system_file}")
+    print(f"System report: {system_file}")
 
     # Create summary report
     summary_file = output_path / f"summary_report_{timestamp}.json"
@@ -254,12 +254,12 @@ def export_reports(output_dir: str = "reports"):
     }
     with open(summary_file, "w") as f:
         json.dump(summary, f, indent=2, default=str)
-    print(f"✅ Summary report: {summary_file}")
+    print(f"Summary report: {summary_file}")
 
 
 def optimize_system():
     """Perform system optimization."""
-    print("\n🔧 System Optimization")
+    print("\nSystem Optimization")
     print("=" * 60)
 
     # Optimize memory
@@ -270,7 +270,7 @@ def optimize_system():
     print("Optimizing cache...")
     get_model_cache().optimize_cache()
 
-    print("✅ System optimization completed")
+    print("System optimization completed")
 
 
 def main():
@@ -337,7 +337,7 @@ def main():
             export_reports(args.output_dir)
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         sys.exit(1)
 
 
